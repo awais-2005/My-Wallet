@@ -1,0 +1,253 @@
+import React, { useContext, useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import EmptyMessage from '../../components/EmptyMessage';
+import TransactionCard from '../../components/TransactionCard';
+import { screenHeight } from '../../App';
+import { TransactionContext } from '../context/TransactionContext';
+import Ionicons from 'react-native-vector-icons/Ionicons'
+export let allTransactions = [];
+
+
+export default function HomeScreen({ navigation }) {
+  
+  const hei = screenHeight - 500;
+
+  const context = useContext(TransactionContext);
+  useEffect(() => {
+    context.setNavigation(navigation);
+  }, [context, navigation]);
+
+  useEffect(() => {
+    let total = 0;
+    let spent = 0;
+    let inWallet = 0;
+    context.listOfTransactions.forEach((tx) => {
+      total += tx.amount > 0 ? tx.amount : 0;
+      spent += tx.amount < 0 ? tx.amount : 0;
+      inWallet += tx.amount;
+    });
+    setTotalBalance(total);
+    setSpent(spent === 0 ? spent : -spent);
+    setInWallet(inWallet);
+  }, [context.listOfTransactions]);
+
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [totalSpent, setSpent] = useState(0);
+  const [totalInWallet, setInWallet] = useState(0);
+  const [showOptions, setShowOptions] = useState(false);
+
+
+  return (
+    <View style={styles.main}>
+      <View style={styles.topBgShape} />
+      <View style={styles.greetingBlock}>
+        <Text style={styles.greeting}>{getGreeting()}</Text>
+        <Text style={styles.name}>What's new!</Text>
+      </View>
+      <View style={styles.overviewCard}>
+        {/* This button is not working. I don't know why?*/}
+        <TouchableOpacity style={styles.option} disabled={false} onPress={() => {setShowOptions(!showOptions)}}>
+          <Ionicons name={showOptions ? "close" : "ellipsis-vertical"} size={20} color={'#fff'}/>
+        </TouchableOpacity>
+        {showOptions && (
+          <View style={styles.optionContainer}>
+            <TouchableOpacity style={styles.optionButton} onPress={() => {setShowOptions(false)}}>
+              <Text>Monthy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.optionButton} onPress={() => {setShowOptions(false)}}>
+              <Text>All Time</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        <View style={styles.totalBlock}>
+          <Text style={styles.title}>In Wallet</Text>
+          <Text style={styles.totalAmount}>Rs {formatAmount(totalInWallet)}</Text>
+        </View>
+        <View style={styles.lowerBlock}>
+          <View style={styles.walletBlock}>
+            <Text style={styles.title}>Total Received</Text>
+            <Text style={styles.walletAmount}>Rs {formatAmount(totalBalance)}</Text>
+          </View>
+          <View style={styles.walletBlock}>
+            <Text style={styles.title}>Spent</Text>
+            <Text style={styles.walletAmount}>Rs {formatAmount(totalSpent)}</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.txSeeAllBlock}>
+        <Text style={styles.blockLabel}>Transactions History</Text>
+        {(context.listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => {navigation.navigate('History')}} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
+      </View>
+      <ScrollView style={styles.listOfTransactions} >
+        {
+          (context.listOfTransactions.length === 0) && (<EmptyMessage key="emptyMessge" marginTop={30} message="No Transaction Found" />) ||
+          ((context.listOfTransactions.length > Math.floor(hei / 55)) && (context.listOfTransactions.slice(0, Math.floor(hei / 55)).map((tx) => <TransactionCard key={tx.id} transObj={tx} />))) ||
+          (context.listOfTransactions.map((tx) => <TransactionCard key={tx.id} transObj={tx} />))
+        }
+      </ScrollView>
+      {/* <TouchableOpacity style={styles.addButton} onPress={() => {navigation.navigate('AddTransaction')}}>
+        <Icon name="add" size={35} color="#fff" />
+      </TouchableOpacity> */}
+      {/* <BottomNav navigation={navigation} screenName={'Home'}/> */}
+    </View>
+  );
+}
+
+export function setAllTransactions(allFetchedTransactions) {
+  allTransactions = allFetchedTransactions;
+}
+
+export function formatAmount(amount, frac = 2) {
+  return amount.toLocaleString('en-US', {
+    minimumFractionDigits: frac,
+    maximumFractionDigits: frac,
+  });
+}
+
+function getGreeting() {
+  let currentTime = new Date().toString().split(' ');
+  const hr = Number(currentTime[4].slice(0, 2));
+  if (hr >= 5 && hr <= 11) {
+    return 'Good Morning';
+  }
+  if (hr >= 12 && hr <= 16) {
+    return 'Good Afternoon';
+  }
+  if (hr >= 17 && hr <= 20) {
+    return 'Good Evening';
+  }
+  if (hr >= 21 || hr <= 4) {
+    return 'Good Night';
+  }
+
+}
+
+const styles = StyleSheet.create({
+  main: {
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#fff',
+  },
+  topBgShape: {
+    height: '200%',
+    width: '300%',
+    backgroundColor: '#368984',
+    position: 'absolute',
+    top: '-162%',
+    left: '-100%',
+    borderRadius: 690,
+  },
+  greetingBlock: {
+    marginLeft: '5%',
+    marginTop: 60,
+  },
+  greeting: {
+    color: '#fff',
+    fontSize: 13,
+  },
+  name: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  overviewCard: {
+    marginLeft: '5%',
+    marginTop: 30,
+    height: 200,
+    width: '90%',
+    backgroundColor: '#2F7D79',
+    borderRadius: 20,
+    padding: 25,
+    justifyContent: 'space-between',
+    elevation: 20,
+  },
+  option: {
+    backgroundColor: '#368984',
+    height: 25,
+    width: 25,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 25,
+    right: 25,
+    zIndex: 200,
+  },
+  optionButton: {
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2F7D79',
+    paddingRight: 30,
+    backgroundColor: '#368984',
+  },
+  optionContainer: {
+    position: 'absolute',
+    top: 25,
+    right: 25,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 10,
+    zIndex: 100,
+    overflow: 'hidden',
+  },  
+  title: {
+    fontSize: 15,
+    color: '#fff',
+  },
+  totalAmount: {
+    fontSize: 26,
+    color: '#fff',
+    fontWeight: '700',
+  },
+  lowerBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  walletBlock: {
+    gap: 5,
+  },
+  walletAmount: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  txSeeAllBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    marginLeft: '5%',
+    marginTop: 30,
+  },
+  blockLabel: {
+    color: '#000',
+    fontWeight: '700',
+    fontSize: 18,
+  },
+  seeAllButton: {
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 13.5,
+    borderRadius: 50,
+  },
+  seeAllText: {
+    color: '#3c3c3c',
+  },
+  listOfTransactions: {
+    width: '100%',
+    marginTop: 15,
+    backgroundColor: '#fff',
+  },
+  addButton: {
+    height: 65,
+    width: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 32.5,
+    backgroundColor: '#368984',
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+});

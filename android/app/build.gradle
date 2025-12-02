@@ -84,6 +84,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     signingConfigs {
         debug {
@@ -91,6 +92,14 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
+        }
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
         }
     }
     buildTypes {
@@ -105,6 +114,17 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def projectName = "My Wallet"
+            def version = variant.versionName
+            def date = new Date().format("yyyy-MM-dd")
+            def flavor = variant.name
+            def variantName = variant.name.capitalize()
+            
+            output.outputFileName = "${projectName}-v${1.1}.apk"
+        }
+    }
 }
 
 dependencies {
@@ -117,3 +137,6 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
