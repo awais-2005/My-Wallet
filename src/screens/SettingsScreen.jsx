@@ -1,10 +1,12 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
 import Foundation from 'react-native-vector-icons/Foundation'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Navbar from '../../components/Navbar'
+import { useContext } from 'react'
+import { TransactionContext } from '../context/TransactionContext'
+import { Clipboard } from 'react-native'
 
 const options = (text, icon, size, choice) => { // pass icon name as well later
   return (
@@ -24,15 +26,18 @@ const options = (text, icon, size, choice) => { // pass icon name as well later
 
 const SettingsScreen = ({ navigation }) => {
   // const [value, setValue] = useState('');
-  // const { importData } = useContext(TransactionContext);
-  const optionsList = [
-    options('Change Currency (Coming Soon)', 'dollar', 30, 1),
-    options('Backup Data (Coming Soon)', 'backup', 24, 2),
-    options('Import Data (Coming Soon)', 'file-import', 22, 3),
-    options('Edit username (Coming Soon)', 'user-pen', 20, 3),
-    options('Guide (Coming Soon)', 'book', 24, 4),
-    options('About App (Coming Soon)', 'information-circle', 24, 4),
-  ];
+  
+  const { setAllRemainingsTx, listOfTransactions } = useContext(TransactionContext);
+  const copyData = () => Clipboard.setString(JSON.stringify(listOfTransactions))
+  // const optionsList = [
+  //   options('Change Currency (Coming Soon)', 'dollar', 30, 1),
+  //   options('Backup Data (Coming Soon)', 'backup', 24, 2),
+  //   options('Import Data (Coming Soon)', 'file-import', 22, 3),
+  //   options('Edit username (Coming Soon)', 'user-pen', 20, 3),
+  //   options('Guide (Coming Soon)', 'book', 24, 4),
+  //   options('About App (Coming Soon)', 'information-circle', 24, 4),
+  // ];
+  
   return (
     <View style={styles.main}>
       <Navbar navigation={navigation} screenTitle={'Settings'} />
@@ -67,12 +72,16 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Import Data</Text>
       </TouchableOpacity> */}
 
-      {/* <TouchableOpacity style={styles.copyButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.copyButton} onPress={copyData}>
         <Text style={styles.copyButtonText}>Copy Data</Text>
-      </TouchableOpacity> */}
-      <View style={{ marginTop: 30 }}>
+      </TouchableOpacity>
+      {/* <View style={{ marginTop: 30 }}>
         {optionsList}
-      </View>
+      </View> */}
+
+      <TouchableOpacity style={styles.copyButton} onPress={setAllRemainingsTx}>
+        <Text style={styles.copyButtonText}>Merge Months' Remainings</Text>
+      </TouchableOpacity>
     </View >
   )
 }
@@ -84,15 +93,6 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     backgroundColor: '#fff',
-  },
-  topBgShape: {
-    height: '200%',
-    width: '300%',
-    backgroundColor: '#368984',
-    position: 'absolute',
-    top: '-162%',
-    left: '-100%',
-    borderRadius: 690,
   },
   input: {
     margin: 20,
@@ -115,11 +115,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   copyButton: {
-    marginTop: 20,
+    width: '90%',
+    alignSelf: 'center',
+    marginTop: 5,
+    backgroundColor: '#368984',
+    paddingVertical: 10,
     alignItems: 'center',
   },
   copyButtonText: {
-    color: '#368984',
+    color: '#fff',
     fontWeight: '700',
   },
   option: {
@@ -136,5 +140,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#303030',
     fontWeight: '500',
+  },
+  mergeButton: {
+    width: '90%',
+    alignSelf: 'center',
+    height: 60,
+    backgroundColor: 'green',
   },
 })

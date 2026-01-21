@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import EmptyMessage from '../../components/EmptyMessage';
 import TransactionCard from '../../components/TransactionCard';
 import { screenHeight } from '../../App';
@@ -12,7 +12,10 @@ export default function HomeScreen({ navigation }) {
   
   const hei = screenHeight - 500;
 
+  const [overviewCardType, setOverviewCardType] = useState('monthly');
+
   const context = useContext(TransactionContext);
+  console.log(context.listOfTransactions)
   useEffect(() => {
     context.setNavigation(navigation);
   }, [context, navigation]);
@@ -21,15 +24,25 @@ export default function HomeScreen({ navigation }) {
     let total = 0;
     let spent = 0;
     let inWallet = 0;
-    context.listOfTransactions.forEach((tx) => {
-      total += tx.amount > 0 ? tx.amount : 0;
-      spent += tx.amount < 0 ? tx.amount : 0;
-      inWallet += tx.amount;
-    });
+    if(overviewCardType === 'allTime') {
+      context.listOfTransactions.forEach((tx) => {
+        total += (tx.amount > 0 && tx.type !== "remainings") ? tx.amount : 0;
+        spent += tx.amount < 0 ? tx.amount : 0;
+        inWallet += tx.amount;
+      });
+    }
+    else {
+      context.currentMonthtransactions.forEach((tx) => {
+        total += (tx.amount > 0 && tx.type !== "remainings") ? tx.amount : 0;
+        spent += tx.amount < 0 ? tx.amount : 0;
+        inWallet += tx.amount;
+      });
+
+    }
     setTotalBalance(total);
     setSpent(spent === 0 ? spent : -spent);
     setInWallet(inWallet);
-  }, [context.listOfTransactions]);
+  }, [context.listOfTransactions, overviewCardType, context.currentMonthtransactions]);
 
   const [totalBalance, setTotalBalance] = useState(0);
   const [totalSpent, setSpent] = useState(0);
@@ -45,17 +58,22 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.name}>What's new!</Text>
       </View>
       <View style={styles.overviewCard}>
-        {/* This button is not working. I don't know why?*/}
         <TouchableOpacity style={styles.option} disabled={false} onPress={() => {setShowOptions(!showOptions)}}>
           <Ionicons name={showOptions ? "close" : "ellipsis-vertical"} size={20} color={'#fff'}/>
         </TouchableOpacity>
         {showOptions && (
           <View style={styles.optionContainer}>
-            <TouchableOpacity style={styles.optionButton} onPress={() => {setShowOptions(false)}}>
-              <Text>Monthy</Text>
+            <TouchableOpacity style={styles.optionButton} onPress={() => {
+              setOverviewCardType('monthly');
+              setShowOptions(false);
+            }}>
+              <Text style={styles.optionButtonText}>Monthy</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.optionButton} onPress={() => {setShowOptions(false)}}>
-              <Text>All Time</Text>
+            <TouchableOpacity style={styles.optionButton} onPress={() => {
+              setOverviewCardType('allTime');
+              setShowOptions(false);
+            }}>
+              <Text style={styles.optionButtonText}>All Time</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -91,10 +109,6 @@ export default function HomeScreen({ navigation }) {
       {/* <BottomNav navigation={navigation} screenName={'Home'}/> */}
     </View>
   );
-}
-
-export function setAllTransactions(allFetchedTransactions) {
-  allTransactions = allFetchedTransactions;
 }
 
 export function formatAmount(amount, frac = 2) {
@@ -181,11 +195,15 @@ const styles = StyleSheet.create({
     paddingRight: 30,
     backgroundColor: '#368984',
   },
+  optionButtonText: {
+    color: '#fff',
+    fontSize: 13,
+  },
   optionContainer: {
     position: 'absolute',
     top: 25,
     right: 25,
-    backgroundColor: '#fff',
+    backgroundColor: '#2F7D79',
     borderRadius: 10,
     elevation: 10,
     zIndex: 100,

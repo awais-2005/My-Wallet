@@ -210,13 +210,13 @@ function AddTxScreen({ navigation }) {
     );
 }
 
-function getTimeStamp() {
+export function getTimeStamp() {
     let dets = new Date().toString().split(' ');
     const timeStamp = dets[1] + ' ' + Number(dets[2]) + ' ' + dets[3] + ' ' + dets[4];
     return timeStamp;
 }
 
-function getID() {
+export function getID() {
     return getTimeStamp().replace(/[\s' ']/g, '').replace(/[\s':']/g, '');
 }
 
