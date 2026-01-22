@@ -27,16 +27,16 @@ const options = (text, icon, size, choice) => { // pass icon name as well later
 const SettingsScreen = ({ navigation }) => {
   // const [value, setValue] = useState('');
   
-  const { setAllRemainingsTx, listOfTransactions } = useContext(TransactionContext);
+  const { listOfTransactions } = useContext(TransactionContext);
   const copyData = () => Clipboard.setString(JSON.stringify(listOfTransactions))
-  // const optionsList = [
-  //   options('Change Currency (Coming Soon)', 'dollar', 30, 1),
-  //   options('Backup Data (Coming Soon)', 'backup', 24, 2),
-  //   options('Import Data (Coming Soon)', 'file-import', 22, 3),
-  //   options('Edit username (Coming Soon)', 'user-pen', 20, 3),
-  //   options('Guide (Coming Soon)', 'book', 24, 4),
-  //   options('About App (Coming Soon)', 'information-circle', 24, 4),
-  // ];
+  const optionsList = [
+    options('Change Currency (Coming Soon)', 'dollar', 30, 1),
+    options('Backup Data (Coming Soon)', 'backup', 24, 2),
+    options('Import Data (Coming Soon)', 'file-import', 22, 3),
+    options('Edit username (Coming Soon)', 'user-pen', 20, 3),
+    options('Guide (Coming Soon)', 'book', 24, 4),
+    options('About App (Coming Soon)', 'information-circle', 24, 4),
+  ];
   
   return (
     <View style={styles.main}>
@@ -75,13 +75,9 @@ const SettingsScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.copyButton} onPress={copyData}>
         <Text style={styles.copyButtonText}>Copy Data</Text>
       </TouchableOpacity>
-      {/* <View style={{ marginTop: 30 }}>
+      <View style={{ marginTop: 30 }}>
         {optionsList}
-      </View> */}
-
-      <TouchableOpacity style={styles.copyButton} onPress={setAllRemainingsTx}>
-        <Text style={styles.copyButtonText}>Merge Months' Remainings</Text>
-      </TouchableOpacity>
+      </View>
     </View >
   )
 }

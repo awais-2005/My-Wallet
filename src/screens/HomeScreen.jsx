@@ -26,23 +26,24 @@ export default function HomeScreen({ navigation }) {
     let inWallet = 0;
     if(overviewCardType === 'allTime') {
       context.listOfTransactions.forEach((tx) => {
-        total += (tx.amount > 0 && tx.type !== "remainings") ? tx.amount : 0;
+        total += tx.amount > 0 ? tx.amount : 0;
         spent += tx.amount < 0 ? tx.amount : 0;
         inWallet += tx.amount;
       });
     }
     else {
-      context.currentMonthtransactions.forEach((tx) => {
-        total += (tx.amount > 0 && tx.type !== "remainings") ? tx.amount : 0;
+      context.currentMonthTransactions.forEach((tx) => {
+        total += tx.amount > 0 ? tx.amount : 0;
         spent += tx.amount < 0 ? tx.amount : 0;
+      });
+      context.listOfTransactions.forEach((tx) => {
         inWallet += tx.amount;
       });
-
     }
     setTotalBalance(total);
     setSpent(spent === 0 ? spent : -spent);
     setInWallet(inWallet);
-  }, [context.listOfTransactions, overviewCardType, context.currentMonthtransactions]);
+  }, [context.listOfTransactions, overviewCardType, context.currentMonthTransactions]);
 
   const [totalBalance, setTotalBalance] = useState(0);
   const [totalSpent, setSpent] = useState(0);
