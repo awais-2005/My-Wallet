@@ -1,30 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import Navbar from '../../components/Navbar';
 import EditableTxCard from '../../components/EditableTxCard';
-import ArrangedByDaysBlock from '../../components/ArrangedByDaysBlock';
-import ArrangedByTypeBlock from '../../components/ArrangedByTypeBlock';
 import { TransactionContext } from '../context/TransactionContext';
-import DropDown from '../../components/DropDown';
 
 function TransactionScreen({ navigation }) {
 
     const context = useContext(TransactionContext);
-    const [arrangedByDays, setArrangedByDays] = useState([]);
-    const [arrangedByType, setArrangedByType] = useState([]);
-
-    useEffect(() => {
-        setArrangedByDays(getArrangedByDays(context.listOfTransactions));
-        setArrangedByType(getArrangedByType(context.listOfTransactions));
-    }, [context.listOfTransactions]);
-
-    const [value, setValue] = useState(null);
-    const items = [
-        { label: 'Days', value: 'Days' },
-        { label: 'Types', value: 'Types' },
-        { label: 'None', value: 'None' },
-    ];
 
     return (
         <View style={styles.main}>
@@ -34,75 +17,18 @@ function TransactionScreen({ navigation }) {
                 screenTitle="Transaction History"
             />
 
-            <DropDown value={value} setValue={setValue} options={items}/>
-
             <View style={styles.listContainer}>
-                <View style={[styles.cardsContainer, {backgroundColor:  value === 'None' || !value ? '#f0f0f0' : 'transparent'}]}>
-                    {
-                        (value === 'None' || !value) && (
-                            <FlatList
-                                data={context.listOfTransactions}
-                                renderItem={({ item }) => <EditableTxCard item={item} />}
-                                keyExtractor={item => item.id}
-                                initialNumToRender={20}
-                            />
-
-                        ) ||
-                        (value === 'Days') && (
-                            <FlatList
-                                data={arrangedByDays}
-                                renderItem={({ item, index }) => <ArrangedByDaysBlock item={item} index={index} />}
-                                keyExtractor={(item, index) => index.toString()}
-                                initialNumToRender={3}
-                            />
-                        ) ||
-                        (value === 'Types') && (
-                            <FlatList
-                                data={arrangedByType}
-                                renderItem={({ item, index }) => <ArrangedByTypeBlock item={item} index={index} />}
-                                keyExtractor={(item, index) => index.toString()}
-                                initialNumToRender={3}
-                            />
-                        )
-                    }
+                <View style={[styles.cardsContainer, { backgroundColor: '#f0f0f0' }]}>
+                    <FlatList
+                        data={context.listOfTransactions}
+                        renderItem={({ item }) => <EditableTxCard item={item} />}
+                        keyExtractor={item => item.id}
+                        initialNumToRender={20}
+                    />
                 </View>
             </View>
         </View>
     );
-}
-
-function getArrangedByDays(transactions) {
-    console.log("Arranging by days");
-    let days = [];
-    let txCorrespondingToDays = [];
-    let dayCount = -1;
-    for (let tx of transactions) {
-        let dets = tx.date.split(' ');
-        let newDets = dets[0] + ' ' + dets[1] + ' ' + dets[2];
-        if (!days.includes(newDets)) {
-            days.push(newDets);
-            txCorrespondingToDays.push([]);
-            dayCount++;
-        }
-        txCorrespondingToDays[dayCount].push(tx);
-    }
-    console.log('Done.');
-    return txCorrespondingToDays;
-}
-
-function getArrangedByType(transactions) {
-    console.log("Arranging by type");
-    let types = [];
-    let txCorrespondingToType = [];
-    for (let tx of transactions) {
-        if (!types.includes(tx.type)) {
-            types.push(tx.type);
-            txCorrespondingToType.push([]);
-        }
-        txCorrespondingToType[types.indexOf(tx.type)].push(tx);
-    }
-    console.log('Done.');
-    return txCorrespondingToType;
 }
 
 const styles = StyleSheet.create({

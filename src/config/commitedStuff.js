@@ -144,4 +144,37 @@
     //         }
     //     }
 
+    // function getArrangedByDays(transactions) {
+    //     console.log("Arranging by days");
+    //     let days = [];
+    //     let txCorrespondingToDays = [];
+    //     let dayCount = -1;
+    //     for (let tx of transactions) {
+    //         let dets = tx.date.split(' ');
+    //         let newDets = dets[0] + ' ' + dets[1] + ' ' + dets[2];
+    //         if (!days.includes(newDets)) {
+    //             days.push(newDets);
+    //             txCorrespondingToDays.push([]);
+    //             dayCount++;
+    //         }
+    //         txCorrespondingToDays[dayCount].push(tx);
+    //     }
+    //     console.log('Done.');
+    //     return txCorrespondingToDays;
+    // }
+    
+    // function getArrangedByType(transactions) {
+    //     console.log("Arranging by type");
+    //     let types = [];
+    //     let txCorrespondingToType = [];
+    //     for (let tx of transactions) {
+    //         if (!types.includes(tx.type)) {
+    //             types.push(tx.type);
+    //             txCorrespondingToType.push([]);
+    //         }
+    //         txCorrespondingToType[types.indexOf(tx.type)].push(tx);
+    //     }
+    //     console.log('Done.');
+    //     return txCorrespondingToType;
+    // }
     

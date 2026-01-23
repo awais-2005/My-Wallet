@@ -36,7 +36,7 @@ const TabNavigator = () => {
     <Tabs.Screen name="Edit" component={EditTxScreen} />
   </Tabs.Navigator>);
 };
-
+// work on splash screen
 export default function App() {
   return (
     <TxContextProvider>
