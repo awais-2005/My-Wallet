@@ -11,6 +11,8 @@ import EditTxScreen from './src/screens/EditTxScreen';
 import TxContextProvider from './src/context/TransactionContext';
 import CustomBottomTabBar from './components/CustomBottomTabBar';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { OnboardingScreen1, OnboardingScreen2, OnboardingScreen3 } from './src/screens/OnboardingScreens';
 
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
@@ -22,6 +24,26 @@ export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
 
 const Tabs = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+const StackNavigator = () => 
+  <Stack.Navigator
+    screenOptions={{
+      headerShown: false,
+      animation: 'slide_from_right'
+    }}
+  >
+    {/* Onboarding Screens */}
+    <Stack.Screen name="screen1" component={OnboardingScreen1}/>
+    <Stack.Screen name="screen2" component={OnboardingScreen2}/>
+    <Stack.Screen name="screen3" component={OnboardingScreen3}/>
+    
+    {/* Login/Sign-up */}
+    {/* here -- */}
+
+    {/* Main App Entry Point */}
+    <Stack.Screen name="mainApp" component={TabNavigator}/>
+  </Stack.Navigator>;
 
 const TabNavigator = () => {
   return (<Tabs.Navigator
@@ -41,7 +63,7 @@ export default function App() {
   return (
     <TxContextProvider>
       <NavigationContainer>
-        <TabNavigator/>
+        <StackNavigator/>
       </NavigationContainer>
     </TxContextProvider>
   );
