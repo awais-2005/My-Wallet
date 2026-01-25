@@ -26,26 +26,30 @@ export const screenHeight = Dimensions.get('window').height;
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const isNewUser = storage.getBoolean('newUser') ?? false;
-isNewUser && storage.set('newUser', false);
-const StackNavigator = () => 
-  <Stack.Navigator
-    screenOptions={{
-      headerShown: false,
-      animation: 'slide_from_right'
-    }}
-  >
-    {/* Onboarding Screens */}
-    <Stack.Screen name={isNewUser ? "screen1" : "mainApp"} component={() => isNewUser ? OnboardingScreen1() : TabNavigator()}/>
-    <Stack.Screen name="screen2" component={OnboardingScreen2}/>
-    <Stack.Screen name="screen3" component={OnboardingScreen3}/>
-    
-    {/* Login/Sign-up */}
-    {/* here -- */}
+const StackNavigator = () => {
+  const isNewUser = storage.getBoolean('newUser') ?? true;
+  isNewUser && storage.set('newUser', false);
+  return (
+    <Stack.Navigator
+      initialRouteName={isNewUser ? 'screen1' : 'mainApp'}
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right'
+      }}
+    >
+      {/* Onboarding Screens */}
+      <Stack.Screen name="screen1" component={OnboardingScreen1}/>
+      <Stack.Screen name="screen2" component={OnboardingScreen2}/>
+      <Stack.Screen name="screen3" component={OnboardingScreen3}/>
+      
+      {/* Login/Sign-up */}
+      {/* here -- */}
 
-    {/* Main App Entry Point */}
-    <Stack.Screen name="mainApp" component={TabNavigator}/>
-  </Stack.Navigator>;
+      {/* Main App Entry Point */}
+      <Stack.Screen name="mainApp" component={TabNavigator}/>
+    </Stack.Navigator>
+    )
+  };
 
 const TabNavigator = () => {
   return (<Tabs.Navigator
