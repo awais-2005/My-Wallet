@@ -1,9 +1,10 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
-import EncryptedStorage from "react-native-encrypted-storage";
-import { fakeList } from "../config/test";
+import { createMMKV } from "react-native-mmkv";
 
 export const TransactionContext = createContext();
+
+export const storage = createMMKV();
 
 export default function TxContextProvider({ children }) {
 
@@ -11,37 +12,28 @@ export default function TxContextProvider({ children }) {
     const [navigation, setNavigation] = useState({});
 
     useEffect(() => {
-        console.log("Fetcher useEffect is running!");
-        EncryptedStorage.getItem('transactions')
-            .then((data) => {
-                try {
-                    const objArray = (data && JSON.parse(data).length > 0) ? JSON.parse(data) : fakeList;
-                    console.log("objArray: ", objArray);
-                    setListOfTransactions(typeof(objArray) === 'string' ? [] : objArray);
-                } catch (error) {
-                    Alert.alert('Error', error);
-                }
-            })
-            .catch((e) => {
-                Alert.alert('Failed', 'Failed to get transaction list.');
-            });
+        // Fetching transactions from storage.
+        const data = storage.getString('transactions')
+        const objArray = data ? JSON.parse(data) : [];
+        setListOfTransactions(typeof (objArray) === 'string' ? [] : objArray);
     }, []);
 
     const deleteTransaction = useCallback((transaction) => {
         let updatedTransactions = listOfTransactions.filter(tx => tx.id !== transaction.id && tx);
-        EncryptedStorage.setItem('transactions', JSON.stringify(updatedTransactions)).then(() => {
+        try {
+            storage.set('transactions', JSON.stringify(updatedTransactions))
             setListOfTransactions(updatedTransactions);
-        }).catch(() => {
-            Alert.alert('Failed', 'Could not deleted the transaction.');
-        });
+        } catch (error) {
+            Alert.alert('Failed', 'Could not deleted the transaction. ' + error);
+        }
     }, [listOfTransactions]);
 
 
     const addNewTransaction = useCallback((newTransaction, showAlert = true) => {
 
         const updatedTransactions = [newTransaction, ...listOfTransactions];
-
-        EncryptedStorage.setItem('transactions', JSON.stringify(updatedTransactions)).then(() => {
+        try {
+            storage.set('transactions', JSON.stringify(updatedTransactions));
             setListOfTransactions(updatedTransactions);
             showAlert && Alert.alert('Success', 'Transaction has been saved.', [
                 {
@@ -50,28 +42,31 @@ export default function TxContextProvider({ children }) {
                     onPress: () => { navigation && navigation.canGoBack() && navigation.goBack() },
                 }
             ]);
-        }).catch((err) => {
-            Alert.alert('Failed', 'Could not save transaction.', err);
-        });
+
+        } catch (error) {
+            Alert.alert('Failed', 'Could not save transaction. ' + error);
+        }
     }, [listOfTransactions, navigation]);
 
     const updateTransaction = useCallback((editedTransaction) => {
         let updatedTransactions = listOfTransactions.map((tx) => editedTransaction.id === tx.id ? editedTransaction : tx);
-        EncryptedStorage.setItem('transactions', JSON.stringify(updatedTransactions)).then(() => {
+        try {
+            storage.set('transactions', JSON.stringify(updatedTransactions));
             setListOfTransactions(updatedTransactions);
             navigation && navigation.canGoBack() && navigation.goBack();
-        }).catch(() => {
+        } catch (error) {
             Alert.alert('Failed', 'Could not update transaction history.');
-        });
+        }
     }, [listOfTransactions, navigation]);
 
     const importData = (transactions) => {
-        EncryptedStorage.setItem('transactions', transactions).then(() => {
+        try {
+            storage.set('transactions', transactions)
             setListOfTransactions(JSON.parse(transactions));
             Alert.alert('Success', 'Transaction history has been imported successfully.');
-        }).catch(() => {
+        } catch (error) {
             Alert.alert('Failed', 'Could not import transaction history.');
-        });
+        }
     };
 
     // Extracting years and months for chart
@@ -123,7 +118,7 @@ export default function TxContextProvider({ children }) {
 
         // pass setter or not optional
         setData && setData(data);
-        
+
         return data;
     }, [listOfTransactions]);
 
@@ -194,10 +189,10 @@ export default function TxContextProvider({ children }) {
         let [Day, currMonth, date, currYear] = new Date().toString().split(' ');
 
         let data = [];
-        
+
         listOfTransactions.forEach((tx) => {
             const [txMonth, txDate, txYear] = tx.date.split(' ');
-            if(currMonth === txMonth && currYear === txYear) {
+            if (currMonth === txMonth && currYear === txYear) {
                 data.push(tx);
             }
         });

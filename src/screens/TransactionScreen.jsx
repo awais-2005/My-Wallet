@@ -1,9 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import Navbar from '../../components/Navbar';
 import EditableTxCard from '../../components/EditableTxCard';
 import { TransactionContext } from '../context/TransactionContext';
+import LottieView from 'lottie-react-native';
+import { screenHeight, screenWidth } from '../../App';
 
 function TransactionScreen({ navigation }) {
 
@@ -17,7 +19,7 @@ function TransactionScreen({ navigation }) {
                 screenTitle="Transaction History"
             />
 
-            <View style={styles.listContainer}>
+            {context.listOfTransactions.length > 0 && (<View style={styles.listContainer}>
                 <View style={[styles.cardsContainer, { backgroundColor: '#f0f0f0' }]}>
                     <FlatList
                         data={context.listOfTransactions}
@@ -26,11 +28,23 @@ function TransactionScreen({ navigation }) {
                         initialNumToRender={20}
                     />
                 </View>
-            </View>
+            </View>)}
+            {context.listOfTransactions.length === 0 &&
+                (<View style={styles.animationContainer}>
+                    <LottieView
+                        source={require('../../assets/no_result_found.json')}
+                        autoPlay={true}
+                        loop={false}
+                        style={{width: wp(90), height: wp(60) }}
+                    />
+                    <Text style={styles.emptyText}>No Transaction!</Text>
+                </View>)
+            }
         </View>
     );
 }
-
+export const wp = (scale) => (screenWidth/100)*scale;
+export const hp = (scale) => (screenHeight/100)*scale;
 const styles = StyleSheet.create({
     main: {
         height: '100%',
@@ -45,6 +59,16 @@ const styles = StyleSheet.create({
         top: '-162%',
         left: '-100%',
         borderRadius: 690,
+    },
+    animationContainer: {
+        width: '100%',
+        height: '90%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        marginTop: -20,
+        fontSize: (screenWidth/100)*4.5,
     },
     listContainer: {
         width: '100%',

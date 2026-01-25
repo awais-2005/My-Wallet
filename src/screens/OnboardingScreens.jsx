@@ -1,22 +1,27 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import LottieView from 'lottie-react-native';
+import { hp, wp } from './TransactionScreen';
 
 const OnboardingScreen1 = ({ navigation }) => {
+  
   return (
     <View style={styles.main} >
 
         <View style={styles.animationContainer}>
             <LottieView
-                source={require('../../assets/loading.json')}
-                loop
-                autoplay
-                style={{width: 250}}
+                source={require('../../assets/revenue.json')}
+                autoPlay={true}
+                style={{width: wp(95), height: wp(95)}}
             />
+        </View>
+        <View style={styles.textBlock}>
+          <Text style={styles.heading} >Master Your Money</Text>
+          <Text style={styles.subText} >Track your every penny and gain control over your financial life.</Text>
         </View>
 
       <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("screen2")}>
-        <Text>Next</Text>
+        <Text style={styles.nextButtonText} >Next</Text>
       </TouchableOpacity>
     </View>
   )
@@ -27,17 +32,21 @@ const OnboardingScreen2 = ({ navigation }) => {
   return (
     <View style={styles.main} >
 
+        <View style={styles.textBlock}>
+          <Text style={styles.heading} >Log Daily Expenses</Text>
+          <Text style={styles.subText} >Easily record your spending on the go just in few taps.</Text>
+        </View>
+
         <View style={styles.animationContainer}>
             <LottieView
-                source={require('../../assets/Revenue.json')}
-                loop
-                autoplay
-                style={{width: 250}}
+                source={require('../../assets/writing.json')}
+                autoPlay={true}
+                style={{width: wp(95), height: wp(95)}}
             />
         </View>
 
       <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("screen3")}>
-        <Text>Next</Text>
+        <Text style={styles.nextButtonText} >Next</Text>
       </TouchableOpacity>
     </View>
   )
@@ -47,17 +56,22 @@ const OnboardingScreen3 = ({ navigation }) => {
   return (
     <View style={styles.main} >
 
-        <View style={styles.animationContainer}>
+        <View style={styles.designedBlock}>
+          <Text style={[styles.heading, {color: '#f0f0f0'}]} >Insightful Analysis</Text>
+          <Text style={[styles.subText, {color: '#f0f0f0'}]} >Visualize your spending patterns and save more every month.</Text>
+        </View>
+
+        <View style={[styles.animationContainer, {marginTop: hp(25)}]}>
             <LottieView
-                source={require('../../assets/no_result_found.json')}
-                loop
-                autoplay
-                style={{width: 250}}
+                source={require('../../assets/chart.json')}
+                autoPlay={true}
+                loop={false}
+                style={{width: wp(130), height: wp(130)}}
             />
         </View>
 
       <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("mainApp")}>
-        <Text>Next</Text>
+        <Text style={styles.nextButtonText} >Get Started</Text>
       </TouchableOpacity>
     </View>
   )
@@ -71,20 +85,60 @@ const styles = StyleSheet.create({
     main: {
         width: '100%',
         height: '100%',
+        paddingTop: hp(12),
+        backgroundColor: '#fff',
+        alignItems: 'center',
+    },
+    designedBlock: {
+      width: wp(200),
+      height: wp(200),
+      backgroundColor: '#368984',
+      borderRadius: wp(100),
+      borderWidth: 5,
+      borderColor: '#9dcecb',
+      alignItems: 'center',
+      paddingHorizontal: wp(55),
+      paddingVertical: wp(15),
+      gap: 5,
+      justifyContent: 'flex-end',
+      position: 'absolute',
+      top: -wp(145),
     },
     animationContainer: {
-        width: '100%',
-        marginTop: 50,
+        width: wp(100),
+        height: wp(100),
         alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textBlock: {
+      width: '85%',
+      alignItems: 'center',
+      gap: 5,
+    },
+    heading: {
+      fontSize: wp(8.2),
+      fontWeight: '700',
+      textAlign: 'center',
+      color: '#368984',
+      transform: [{scaleY: 1.05}]
+    },
+    subText: {
+      textAlign: 'center',
+      color: '#505050',
+      fontSize: wp(4.3),
     },
     nextButton: {
         width: '90%',
-        marginLeft: '5%',
-        backgroundColor: '#ff4400',
-        paddingVertical: 10,
+        backgroundColor: '#368984',
+        paddingVertical: 12,
         alignItems: 'center',
-        borderRadius: 50,
+        borderRadius: 10,
         position: 'absolute',
         bottom: 20,
+    },
+    nextButtonText: {
+      fontSize: wp(4.5),
+      fontWeight: 700,
+      color: '#fff',
     }
 })

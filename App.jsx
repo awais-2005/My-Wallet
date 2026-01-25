@@ -13,6 +13,7 @@ import CustomBottomTabBar from './components/CustomBottomTabBar';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingScreen1, OnboardingScreen2, OnboardingScreen3 } from './src/screens/OnboardingScreens';
+import { storage } from './src/context/TransactionContext';
 
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
@@ -25,7 +26,8 @@ export const screenHeight = Dimensions.get('window').height;
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-
+const isNewUser = storage.getBoolean('newUser') ?? false;
+isNewUser && storage.set('newUser', false);
 const StackNavigator = () => 
   <Stack.Navigator
     screenOptions={{
@@ -34,7 +36,7 @@ const StackNavigator = () =>
     }}
   >
     {/* Onboarding Screens */}
-    <Stack.Screen name="screen1" component={OnboardingScreen1}/>
+    <Stack.Screen name={isNewUser ? "screen1" : "mainApp"} component={() => isNewUser ? OnboardingScreen1() : TabNavigator()}/>
     <Stack.Screen name="screen2" component={OnboardingScreen2}/>
     <Stack.Screen name="screen3" component={OnboardingScreen3}/>
     
