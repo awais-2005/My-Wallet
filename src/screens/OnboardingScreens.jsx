@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import LottieView from 'lottie-react-native';
 import { hp, wp } from './TransactionScreen';
+import { storage } from '../context/TransactionContext';
 
 const OnboardingScreen1 = ({ navigation }) => {
   
@@ -70,7 +71,10 @@ const OnboardingScreen3 = ({ navigation }) => {
             />
         </View>
 
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("mainApp")}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => {
+        storage.set('newUserCheck', false);
+        navigation.navigate("mainApp");
+        }}>
         <Text style={styles.nextButtonText} >Get Started</Text>
       </TouchableOpacity>
     </View>

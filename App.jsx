@@ -27,8 +27,7 @@ export const screenHeight = Dimensions.get('window').height;
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
-  const isNewUser = storage.getBoolean('newUser') ?? true;
-  isNewUser && storage.set('newUser', false);
+  const isNewUser = storage.getBoolean('newUserCheck') ?? true;
   return (
     <Stack.Navigator
       initialRouteName={isNewUser ? 'screen1' : 'mainApp'}
