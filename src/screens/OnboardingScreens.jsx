@@ -67,13 +67,14 @@ const OnboardingScreen3 = ({ navigation }) => {
                 source={require('../../assets/chart.json')}
                 autoPlay={true}
                 loop={false}
+                speed={4}
                 style={{width: wp(130), height: wp(130)}}
             />
         </View>
 
       <TouchableOpacity style={styles.nextButton} onPress={() => {
         storage.set('newUserCheck', false);
-        navigation.navigate("mainApp");
+        navigation.navigate("login");
         }}>
         <Text style={styles.nextButtonText} >Get Started</Text>
       </TouchableOpacity>

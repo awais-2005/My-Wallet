@@ -14,12 +14,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingScreen1, OnboardingScreen2, OnboardingScreen3 } from './src/screens/OnboardingScreens';
 import { storage } from './src/context/TransactionContext';
-
-Text.defaultProps = Text.defaultProps || {};
-Text.defaultProps.allowFontScaling = false;
-
-TextInput.defaultProps = TextInput.defaultProps || {};
-TextInput.defaultProps.allowFontScaling = false;
+import LoginScreen from './src/screens/LoginScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import AddProfilePhotoScreen from './src/screens/AddProfilePhotoScreen';
 
 export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
@@ -39,10 +36,12 @@ const StackNavigator = () => {
       {/* Onboarding Screens */}
       <Stack.Screen name="screen1" component={OnboardingScreen1}/>
       <Stack.Screen name="screen2" component={OnboardingScreen2}/>
-      <Stack.Screen name="screen3" component={OnboardingScreen3}/>
+      <Stack.Screen name="screen3" component={OnboardingScreen3} />
       
       {/* Login/Sign-up */}
-      {/* here -- */}
+      <Stack.Screen name='login' component={LoginScreen} options={{animation: 'fade_from_bottom'}} />
+      <Stack.Screen name='register' component={RegisterScreen} options={{animation: 'fade_from_bottom'}} />
+      <Stack.Screen name='addProfile' component={AddProfilePhotoScreen} options={{animation: 'slide_from_right'}} />
 
       {/* Main App Entry Point */}
       <Stack.Screen name="mainApp" component={TabNavigator}/>
