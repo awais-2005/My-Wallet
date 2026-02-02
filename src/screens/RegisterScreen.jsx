@@ -6,12 +6,53 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { API_KEY, SERVER_URL } from '../config/constants';
+import { storage } from '../context/TransactionContext';
+import register from '../utils/register';
+import login from '../utils/login';
 
 const RegisterScreen = ({ navigation }) => {
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const handleAccountCreation = async () => {
+
+    if (password !== confirmPassword) return;
+
+    try {
+      
+      const registerResponse = await register(name, email, password);
+
+      if (!registerResponse.ok) {
+        const data = await registerResponse.json();
+        throw new Error("Register Api failure: " + JSON.stringify(data));
+      }
+
+      const loginResponse = await login(email, password);
+
+      if (!loginResponse.ok) {
+        const data = await loginResponse.json();
+        throw new Error("Login Api failure: " + JSON.stringify(data));
+      }
+      
+      const { id, token } = await loginResponse.json();
+      
+      const user = { id, name, email, token };
+      storage.set('user', JSON.stringify(user));
+      
+      navigation.navigate('mainApp')
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Registration Failure", "Sorry for inconvenience, Please again later.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,6 +80,8 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput
           placeholder="e.g. John Doe"
           placeholderTextColor="#9CA3AF"
+          value={name}
+          onChangeText={setName}
           style={styles.input}
         />
       </View>
@@ -49,6 +92,8 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput
           placeholder="name@example.com"
           placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
           style={styles.input}
         />
       </View>
@@ -61,6 +106,8 @@ const RegisterScreen = ({ navigation }) => {
             placeholder="Create a password"
             placeholderTextColor="#9CA3AF"
             secureTextEntry={secure1}
+            value={password}
+            onChangeText={setPassword}
             style={styles.passwordInput}
           />
           <TouchableOpacity onPress={() => setSecure1(!secure1)}>
@@ -80,6 +127,8 @@ const RegisterScreen = ({ navigation }) => {
           <TextInput
             placeholder="Re-enter password"
             placeholderTextColor="#9CA3AF"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
             secureTextEntry={secure2}
             style={styles.passwordInput}
           />
@@ -94,7 +143,7 @@ const RegisterScreen = ({ navigation }) => {
       </View>
 
       {/* Button */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('addProfile')}>
+      <TouchableOpacity style={styles.button} onPress={handleAccountCreation}>
         <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
 
