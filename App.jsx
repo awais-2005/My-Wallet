@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Dimensions, TextInput } from 'react-native';
+import { Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from './src/screens/HomeScreen';
@@ -17,13 +17,16 @@ import { storage } from './src/context/TransactionContext';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import AddProfilePhotoScreen from './src/screens/AddProfilePhotoScreen';
+import ChangeCurrencyScreen from './src/screens/ChangeCurrencyScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
+import AboutAppScreen from './src/screens/AboutAppScreen';
 
 export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const StackNavigator = () => {
+const Onboarding = () => {
   const isNewUser = storage.getBoolean('newUserCheck') ?? true;
   return (
     <Stack.Navigator
@@ -34,31 +37,47 @@ const StackNavigator = () => {
       }}
     >
       {/* Onboarding Screens */}
-      <Stack.Screen name="screen1" component={OnboardingScreen1}/>
-      <Stack.Screen name="screen2" component={OnboardingScreen2}/>
+      <Stack.Screen name="screen1" component={OnboardingScreen1} />
+      <Stack.Screen name="screen2" component={OnboardingScreen2} />
       <Stack.Screen name="screen3" component={OnboardingScreen3} />
-      
+
       {/* Login/Sign-up */}
-      <Stack.Screen name='login' component={LoginScreen} options={{animation: 'fade_from_bottom'}} />
-      <Stack.Screen name='register' component={RegisterScreen} options={{animation: 'fade_from_bottom'}} />
-      <Stack.Screen name='addProfile' component={AddProfilePhotoScreen} options={{animation: 'slide_from_right'}} />
+      <Stack.Screen name='login' component={LoginScreen} options={{ animation: 'fade_from_bottom' }} />
+      <Stack.Screen name='register' component={RegisterScreen} options={{ animation: 'fade_from_bottom' }} />
+      <Stack.Screen name='addProfile' component={AddProfilePhotoScreen} options={{ animation: 'slide_from_right' }} />
 
       {/* Main App Entry Point */}
-      <Stack.Screen name="mainApp" component={TabNavigator}/>
+      <Stack.Screen name="mainApp" component={TabNavigator} />
     </Stack.Navigator>
-    )
-  };
+  )
+};
+
+const SettingsStackNavigator = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'fade'
+      }}
+    >
+      <Stack.Screen name="settingsScreen" component={SettingsScreen} />
+      <Stack.Screen name="changeCurrency" component={ChangeCurrencyScreen}/>
+      <Stack.Screen name="editProfile" component={EditProfileScreen} />
+      <Stack.Screen name="aboutApp" component={AboutAppScreen} />
+    </Stack.Navigator>
+  )
+}
 
 const TabNavigator = () => {
   return (<Tabs.Navigator
-    screenOptions={{headerShown: false}}
-    tabBar={(props) => {return <CustomBottomTabBar {...props} />}}
-    >
+    screenOptions={{ headerShown: false }}
+    tabBar={(props) => { return <CustomBottomTabBar {...props} /> }}
+  >
     <Tabs.Screen name="Home" component={HomeScreen} />
     <Tabs.Screen name="History" component={TransactionScreen} />
     <Tabs.Screen name="New" component={AddTxScreen} />
     <Tabs.Screen name="Analysis" component={AnalysisScreen} />
-    <Tabs.Screen name="Settings" component={SettingsScreen} />
+    <Tabs.Screen name="Settings" component={SettingsStackNavigator} />
     <Tabs.Screen name="Edit" component={EditTxScreen} />
   </Tabs.Navigator>);
 };
@@ -67,7 +86,7 @@ export default function App() {
   return (
     <TxContextProvider>
       <NavigationContainer>
-        <StackNavigator/>
+        <Onboarding />
       </NavigationContainer>
     </TxContextProvider>
   );
