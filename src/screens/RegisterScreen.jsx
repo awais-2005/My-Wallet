@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -9,48 +9,50 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { API_KEY, SERVER_URL } from '../config/constants';
-import { storage } from '../context/TransactionContext';
+import { storage, TransactionContext } from '../context/TransactionContext';
 import register from '../utils/register';
 import login from '../utils/login';
+import LoadingAnimation from '../../components/LoadingAnimation';
 
 const RegisterScreen = ({ navigation }) => {
+
+  const {user, setUser} = useContext(TransactionContext);
+
   const [secure1, setSecure1] = useState(true);
   const [secure2, setSecure2] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const handleAccountCreation = async () => {
-
-    if (password !== confirmPassword) return;
-
     try {
-      
-      const registerResponse = await register(name, email, password);
-
+      if (password !== confirmPassword) throw new Error("Password confirmation failed");
+      setLoading(true);
+      const registerResponse = await register(name.trim(), email.trim(), password.trim());
       if (!registerResponse.ok) {
         const data = await registerResponse.json();
         throw new Error("Register Api failure: " + JSON.stringify(data));
       }
-
-      const loginResponse = await login(email, password);
-
+      const loginResponse = await login(email.trim(), password.trim());
       if (!loginResponse.ok) {
         const data = await loginResponse.json();
         throw new Error("Login Api failure: " + JSON.stringify(data));
       }
-      
       const { id, token } = await loginResponse.json();
-      
-      const user = { id, name, email, token };
+      user.id = id;
+      user.name = name;
+      user.email = email;
+      user.token = token;
+      setUser({...user});
       storage.set('user', JSON.stringify(user));
-      
-      navigation.navigate('mainApp')
+      navigation.navigate('addProfile');
     } catch (err) {
       console.log(err);
-      Alert.alert("Registration Failure", "Sorry for inconvenience, Please again later.");
+      setLoading(false);
+      Alert.alert("Registration Failure", "Sorry for inconvenience, Please again later. | ERR: " + err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,6 +156,7 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.signInText}> Sign In</Text>
         </TouchableOpacity>
       </View>
+      {loading && (<LoadingAnimation message={'Signing up...'}/>)}
     </SafeAreaView>
   );
 };
