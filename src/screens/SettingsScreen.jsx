@@ -8,11 +8,9 @@ import { useContext } from 'react'
 import { TransactionContext } from '../context/TransactionContext'
 import { Clipboard } from 'react-native'
 
-const options = (text, icon, size, choice) => { // pass icon name as well later
+const options = (id, text, icon, size, choice, screenName, navigateTo) => { // pass icon name as well later
   return (
-    <TouchableOpacity style={styles.option} onPress={() => {
-      Alert.alert('Coming Soon', 'This feature is coming soon!');
-    }}>
+    <TouchableOpacity key={id} style={styles.option} onPress={() => navigateTo(screenName)}>
       <View style={{ width: 30, alignItems: 'center' }}>
         {choice === 1 && (<Foundation name={icon || 'info'} size={size} color="#368984" />)}
         {choice === 2 && (<MaterialIcons name={icon || 'info'} size={size} color="#368984" />)}
@@ -27,15 +25,11 @@ const options = (text, icon, size, choice) => { // pass icon name as well later
 const SettingsScreen = ({ navigation }) => {
   // const [value, setValue] = useState('');
   
-  const { listOfTransactions } = useContext(TransactionContext);
-  const copyData = () => Clipboard.setString(JSON.stringify(listOfTransactions))
   const optionsList = [
-    options('Change Currency (Coming Soon)', 'dollar', 30, 1),
-    options('Backup Data (Coming Soon)', 'backup', 24, 2),
-    options('Import Data (Coming Soon)', 'file-import', 22, 3),
-    options('Edit username (Coming Soon)', 'user-pen', 20, 3),
-    options('Guide (Coming Soon)', 'book', 24, 4),
-    options('About App (Coming Soon)', 'information-circle', 24, 4),
+    options(1, 'Edit username', 'user-pen', 20, 3, 'editProfile', navigation.navigate),
+    options(2, 'Change Currency', 'dollar', 30, 1, 'changeCurrency', navigation.navigate),
+    options(3, 'Backup Data (Coming Soon)', 'backup', 24, 2),
+    options(4, 'About App', 'information-circle', 24, 4, 'aboutApp', navigation.navigate),
   ];
   
   return (
@@ -72,9 +66,6 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Import Data</Text>
       </TouchableOpacity> */}
 
-      <TouchableOpacity style={styles.copyButton} onPress={copyData}>
-        <Text style={styles.copyButtonText}>Copy Data</Text>
-      </TouchableOpacity>
       <View style={{ marginTop: 30 }}>
         {optionsList}
       </View>
