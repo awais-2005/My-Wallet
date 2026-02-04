@@ -1,18 +1,56 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { pickImage, uploadImage } from '../utils/imageUpload';
+import { storage, TransactionContext } from '../context/TransactionContext';
+import LoadingAnimation from '../../components/LoadingAnimation';
+import saveAvatarUri from '../utils/saveNewAvatar';
 
 const AddProfilePhotoScreen = ({ navigation }) => {
+
+  const {user, setUser} = useContext(TransactionContext);
+  const [loading, setLoading] = useState(false);
+  const [profilePic, setProfilePic] = useState('');
+  const [imgObj, setImgObj] = useState({});
+
+  const getImage = async () => {
+    try {
+      const image = await pickImage();
+      setImgObj(image);
+      setProfilePic(image.uri);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const upload = async () => {
+    try {
+      setLoading(true);
+      const uri = await uploadImage(imgObj);
+      if(!user.token) throw new Error("Token is not found");
+      await saveAvatarUri(uri, user.token);
+      user.avatar = uri;
+      setUser({...user});
+      storage.set('user', JSON.stringify(user));
+      navigation.navigate('mainApp');
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Skip */}
-      <TouchableOpacity style={styles.skipBtn}>
+      <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.navigate("mainApp")}>
         <Text style={styles.skipText}>Skip</Text>
       </TouchableOpacity>
 
@@ -26,16 +64,17 @@ const AddProfilePhotoScreen = ({ navigation }) => {
       {/* Avatar */}
       <View style={styles.avatarWrapper}>
         <View style={styles.avatarCircle}>
-          <Icon name="person-outline" size={64} color="#7CCFC4" />
+          {!profilePic && (<Icon name="person-outline" size={64} color="#7CCFC4" />)}
+          {profilePic && (<Image source={{uri: profilePic}} height={220} width={220} resizeMode='cover'/>)}
         </View>
 
-        <TouchableOpacity style={styles.addBtn}>
+        <TouchableOpacity style={styles.addBtn} onPress={ getImage }>
           <Icon name="add" size={26} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
       {/* Upload Button */}
-      <TouchableOpacity style={styles.uploadBtn}>
+      <TouchableOpacity style={styles.uploadBtn} onPress={ upload }>
         <Text style={styles.uploadText}>Upload Photo</Text>
       </TouchableOpacity>
 
@@ -43,6 +82,8 @@ const AddProfilePhotoScreen = ({ navigation }) => {
       <Text style={styles.infoText}>
         Supported formats: JPG, PNG. Max size 5MB.
       </Text>
+
+      {loading && (<LoadingAnimation message={'Uploading profile photo...'}/>)}
     </SafeAreaView>
   );
 };
@@ -98,6 +139,7 @@ const styles = StyleSheet.create({
     borderColor: '#9ADBD2',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden'
   },
 
   addBtn: {
