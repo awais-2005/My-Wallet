@@ -10,7 +10,7 @@ import Navbar from '../../components/Navbar';
 import { TransactionContext } from '../context/TransactionContext';
 
 function AddTxScreen({ navigation }) {
-    
+
     const context = useContext(TransactionContext);
 
     const [open2, setOpen2] = useState(false);
@@ -227,13 +227,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     topBgShape: {
-        height: '200%',
-        width: '300%',
+        height: '33%',
+        width: '100%',
         backgroundColor: '#368984',
         position: 'absolute',
-        top: '-162%',
-        left: '-100%',
-        borderRadius: 690,
+        top: 0,
+        left: 0,
+        borderBottomLeftRadius: 50,
+        borderBottomRightRadius: 50,
     },
     scrollContainer: {
         width: '100%',

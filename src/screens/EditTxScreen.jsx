@@ -15,11 +15,11 @@ function EditTxScreen({ navigation, route }) {
     const context = useContext(TransactionContext);
 
     const [tx, setTx] = useState(route.params);
-    
+
     useEffect(() => {
         setTx(route.params);
     }, [route.params]);
-    
+
     useEffect(() => {
         setTxTitle(tx.title);
         setTxAmount((tx.amount < 0 ? -tx.amount : tx.amount) + '');
@@ -227,13 +227,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     topBgShape: {
-        height: '200%',
-        width: '300%',
+        height: '33%',
+        width: '100%',
         backgroundColor: '#368984',
         position: 'absolute',
-        top: '-162%',
-        left: '-100%',
-        borderRadius: 690,
+        top: 0,
+        left: 0,
+        borderBottomLeftRadius: 50,
+        borderBottomRightRadius: 50,
     },
     scrollContainer: {
         width: '100%',
