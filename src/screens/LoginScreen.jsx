@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,44 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import login from '../utils/login';
+import { storage, TransactionContext } from '../context/TransactionContext';
+import getUserById from '../utils/getUserById';
+import LoadingAnimation from '../../components/LoadingAnimation';
 
 const LoginScreen = ({ navigation }) => {
   const [secure, setSecure] = useState(true);
+  const { setUser } = useContext(TransactionContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      const response1 = await login(email.trim(), password.trim());
+      const { id, token } = await response1.json();
+
+      const response2 = await getUserById(id);
+      const data = await response2.json();
+
+      const user = {
+        ...data,
+        token
+      };
+      storage.set('user', JSON.stringify(user));
+      setUser(user);
+      navigation.navigate("mainApp");
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      Alert.alert("Login Failure", "Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,6 +66,8 @@ const LoginScreen = ({ navigation }) => {
         <TextInput
           placeholder="user@example.com"
           placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
           style={styles.input}
         />
       </View>
@@ -45,6 +80,8 @@ const LoginScreen = ({ navigation }) => {
             placeholder="••••••••"
             placeholderTextColor="#9CA3AF"
             secureTextEntry={secure}
+            value={password}
+            onChangeText={setPassword}
             style={styles.passwordInput}
           />
           <TouchableOpacity onPress={() => setSecure(!secure)}>
@@ -63,7 +100,7 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Button */}
-      <TouchableOpacity style={styles.button} >
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
 
@@ -74,6 +111,7 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.signupText}> Sign Up</Text>
         </TouchableOpacity>
       </View>
+      {loading && (<LoadingAnimation message={'Signing in...'}/>)}
     </SafeAreaView>
   );
 };
