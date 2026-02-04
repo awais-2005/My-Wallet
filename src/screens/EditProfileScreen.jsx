@@ -17,7 +17,7 @@ import { API_KEY, SERVER_URL } from '../config/constants';
 import saveNewInfo from '../utils/saveNewInfo';
 import saveAvatarUri from '../utils/saveNewAvatar';
 import LoadingAnimation from '../../components/LoadingAnimation';
-import { themeColor } from '../config/theme';
+import { lightTheme, themeColor } from '../config/theme';
 
 const EditProfileScreen = ({ navigation }) => {
 
@@ -146,13 +146,15 @@ const styles = StyleSheet.create({
     },
 
     backBtn: {
-        marginTop: 12,
+        marginTop: 24,
         marginBottom: 16,
         width: 40,
     },
 
     avatarWrapper: {
         alignItems: 'center',
+        width: 120,
+        alignSelf: 'center',
         marginBottom: 24,
     },
 
@@ -162,7 +164,7 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         backgroundColor: '#E6F2EF',
         borderWidth: 2,
-        borderColor: '#9ADBD2',
+        borderColor: lightTheme,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     editAvatarBtn: {
         position: 'absolute',
         bottom: 0,
-        left: (wp(50) - 24) - 20 + 40,
+        right: 0,
         width: 40,
         height: 40,
         borderRadius: 20,
