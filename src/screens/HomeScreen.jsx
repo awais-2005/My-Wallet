@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import EmptyMessage from '../../components/EmptyMessage';
 import TransactionCard from '../../components/TransactionCard';
 import { screenHeight } from '../../App';
 import { TransactionContext } from '../context/TransactionContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { lightTheme, themeColor } from '../config/theme';
 export let allTransactions = [];
 
 
@@ -54,9 +55,14 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.main}>
       <View style={styles.topBgShape} />
-      <View style={styles.greetingBlock}>
-        <Text style={styles.greeting}>{getGreeting()}</Text>
-        <Text style={styles.name}>What's new!</Text>
+      <View style={styles.header}>
+        {context.user.avatar && (<View style={styles.profileContainer}>
+          <Image source={{uri: context.user.avatar}} height={50} width={50} resizeMode='cover' />
+        </View>)}
+        <View style={styles.greetingBlock}>
+          <Text style={styles.greeting}>{getGreeting()}</Text>
+          <Text style={styles.name}>{context.user.name || "xyz"}</Text>
+        </View>
       </View>
       <View style={styles.overviewCard}>
         <TouchableOpacity style={styles.option} disabled={false} onPress={() => {setShowOptions(!showOptions)}}>
@@ -104,10 +110,6 @@ export default function HomeScreen({ navigation }) {
           (context.listOfTransactions.map((tx) => <TransactionCard key={tx.id} transObj={tx} />))
         }
       </ScrollView>
-      {/* <TouchableOpacity style={styles.addButton} onPress={() => {navigation.navigate('AddTransaction')}}>
-        <Icon name="add" size={35} color="#fff" />
-      </TouchableOpacity> */}
-      {/* <BottomNav navigation={navigation} screenName={'Home'}/> */}
     </View>
   );
 }
@@ -144,17 +146,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   topBgShape: {
-    height: '200%',
-    width: '300%',
-    backgroundColor: '#368984',
+    height: '35%',
+    width: '100%',
+    backgroundColor: themeColor,
     position: 'absolute',
-    top: '-162%',
-    left: '-100%',
-    borderRadius: 690,
+    top: 0,
+    left: 0,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
-  greetingBlock: {
+  header: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
     marginLeft: '5%',
     marginTop: 60,
+  },
+  profileContainer: {
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: lightTheme,
+    overflow: 'hidden',
   },
   greeting: {
     color: '#fff',
