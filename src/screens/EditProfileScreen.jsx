@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
     View,
     Text,
@@ -7,13 +7,10 @@ import {
     StyleSheet,
     SafeAreaView,
     Image,
-    Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { storage } from '../context/TransactionContext';
-import { wp } from './TransactionScreen';
+import { storage, TransactionContext } from '../context/TransactionContext';
 import { pickImage, uploadImage } from '../utils/imageUpload';
-import { API_KEY, SERVER_URL } from '../config/constants';
 import saveNewInfo from '../utils/saveNewInfo';
 import saveAvatarUri from '../utils/saveNewAvatar';
 import LoadingAnimation from '../../components/LoadingAnimation';
@@ -21,8 +18,8 @@ import { lightTheme, themeColor } from '../config/theme';
 
 const EditProfileScreen = ({ navigation }) => {
 
-    const user = storage.getString('user') ? JSON.parse(storage.getString('user')) : {};
-
+    const context = useContext(TransactionContext);
+    const user = { ...context.user };
     const [profilePic, setProfilePic] = useState(user.avatar || '');
     const [newName, setNewName] = useState(user.name || 'There is something wrong');
     const [newEmail, setNewEmail] = useState(user.email || 'There is something wrong');
@@ -45,6 +42,7 @@ const EditProfileScreen = ({ navigation }) => {
             await saveAvatar();
             await saveNameAndEmail();
             storage.set('user', JSON.stringify(user));
+            context.setUser(user);
             navigation.canGoBack() && navigation.goBack();
         } catch (err) {
             console.log(err);
