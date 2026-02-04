@@ -10,6 +10,7 @@ export default function TxContextProvider({ children }) {
 
     const [listOfTransactions, setListOfTransactions] = useState([]);
     const [navigation, setNavigation] = useState({});
+    const [user, setUser] = useState(storage.getString('user') ? JSON.parse(storage.getString('user')) : {});
 
     useEffect(() => {
         // Fetching transactions from storage.
@@ -28,6 +29,9 @@ export default function TxContextProvider({ children }) {
         }
     }, [listOfTransactions]);
 
+    useEffect(() => {
+        console.log("user updated", user);
+    }, [user])    
 
     const addNewTransaction = useCallback((newTransaction, showAlert = true) => {
 
@@ -202,6 +206,8 @@ export default function TxContextProvider({ children }) {
     const values = useMemo(() => ({
         navigation,
         listOfTransactions,
+        user,
+        setUser,
         setNavigation,
         setListOfTransactions,
         addNewTransaction,
@@ -213,7 +219,7 @@ export default function TxContextProvider({ children }) {
         importData,
         yearAndMonths,
         currentMonthTransactions
-    }), [addNewTransaction, currentMonthTransactions, deleteTransaction, getDataOfDays, getDataOfWeeks, getDataOfYear, listOfTransactions, navigation, updateTransaction, yearAndMonths]);
+    }), [addNewTransaction, currentMonthTransactions, deleteTransaction, getDataOfDays, getDataOfWeeks, getDataOfYear, listOfTransactions, navigation, updateTransaction, user, yearAndMonths]);
 
     return (
         <TransactionContext.Provider value={values}>
