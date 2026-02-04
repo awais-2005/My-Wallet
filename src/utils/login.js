@@ -7,9 +7,9 @@ export default async function login(email, password) {
             "Content-Type": "application/json",
             "x-api-key": API_KEY,
         },
-        body: {
+        body: JSON.stringify({
             email,
             password,
-        },
+        }),
     });
 }
