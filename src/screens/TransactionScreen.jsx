@@ -35,7 +35,7 @@ function TransactionScreen({ navigation }) {
                         source={require('../../assets/no_result_found.json')}
                         autoPlay={true}
                         loop={false}
-                        style={{width: wp(90), height: wp(60) }}
+                        style={{ width: wp(90), height: wp(60) }}
                     />
                     <Text style={styles.emptyText}>No Transaction!</Text>
                 </View>)
@@ -43,8 +43,8 @@ function TransactionScreen({ navigation }) {
         </View>
     );
 }
-export const wp = (scale) => (screenWidth/100)*scale;
-export const hp = (scale) => (screenHeight/100)*scale;
+export const wp = (scale) => (screenWidth / 100) * scale;
+export const hp = (scale) => (screenHeight / 100) * scale;
 const styles = StyleSheet.create({
     main: {
         height: '100%',
@@ -52,13 +52,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     topBgShape: {
-        height: '200%',
-        width: '300%',
+        height: '33%',
+        width: '100%',
         backgroundColor: '#368984',
         position: 'absolute',
-        top: '-162%',
-        left: '-100%',
-        borderRadius: 690,
+        top: 0,
+        left: 0,
+        borderBottomLeftRadius: 50,
+        borderBottomRightRadius: 50,
     },
     animationContainer: {
         width: '100%',
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         marginTop: -20,
-        fontSize: (screenWidth/100)*4.5,
+        fontSize: (screenWidth / 100) * 4.5,
     },
     listContainer: {
         width: '100%',
