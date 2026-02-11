@@ -21,6 +21,10 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const handleLogin = async () => {
+    if(!email.trim() || !password.trim()) {
+      Alert.alert("Login Failure", "Please enter your email and password");
+      return;
+    }
     try {
       setLoading(true);
       const response1 = await login(email.trim(), password.trim());

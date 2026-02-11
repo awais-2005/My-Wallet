@@ -27,6 +27,10 @@ const RegisterScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const handleAccountCreation = async () => {
     try {
+      if([name, email, password, confirmPassword].some( f => !f.trim())) {
+        Alert.alert("Register Failure", "Please fill all the fields.");
+        return;
+      }
       if (password !== confirmPassword) throw new Error("Password confirmation failed");
       setLoading(true);
       const registerResponse = await register(name.trim(), email.trim(), password.trim());
