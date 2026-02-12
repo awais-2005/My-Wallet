@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     cardsContainer: {
-        borderRadius: 10,
+        borderRadius: 14,
         backgroundColor: '#f0f0f0',
         overflow: 'hidden',
     },
