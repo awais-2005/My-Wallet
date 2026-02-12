@@ -115,7 +115,7 @@ export function getIcon(txType, logo1, size) {
 const styles = StyleSheet.create({
     card: {
         paddingVertical: 5,
-        paddingHorizontal: 6,
+        paddingHorizontal: 5,
         borderBottomColor: '#f0f0f0',
         borderBottomWidth: 1,
         width: '100%',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -8,7 +8,7 @@ import AnalysisScreen from './src/screens/AnalysisScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TransactionScreen from './src/screens/TransactionScreen';
 import EditTxScreen from './src/screens/EditTxScreen';
-import TxContextProvider from './src/context/TransactionContext';
+import TxContextProvider, { TransactionContext } from './src/context/TransactionContext';
 import CustomBottomTabBar from './components/CustomBottomTabBar';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,9 +28,11 @@ const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const Onboarding = () => {
   const isNewUser = storage.getBoolean('newUserCheck') ?? true;
+  const { user } = useContext(TransactionContext);
+  const copiedUser = { ...user }
   return (
     <Stack.Navigator
-      initialRouteName={isNewUser ? 'screen1' : 'mainApp'}
+      initialRouteName={isNewUser ? 'screen1' : (Object.keys(copiedUser).length === 0 ? 'login' : 'mainApp')}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right'

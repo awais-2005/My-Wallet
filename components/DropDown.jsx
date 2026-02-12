@@ -1,42 +1,47 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const DropDown = ({ value, setValue, options }) => {
+const DropDown = ({ title, value, setValue, options, dropDownContainerStyle, dropDownButtonStyle, dropDownTextStyle, optionsContainerStyle, optionsTextStyle }) => {
 
     const [open, setOpen] = useState(false);
 
     return (
-        <View style={styles.dropDownContainer}>
-            <TouchableOpacity style={styles.dropDownButton} onPress={() => setOpen(!open)}>
-                <Text style={styles.dropDownText}>{value || 'Categorize by'}</Text>
-                <Icon name={open ? 'chevron-down-outline' : 'chevron-back'} color="#fff" size={18} />
+        <View style={dropDownContainerStyle || styles.dropDownContainer}>
+            <TouchableOpacity style={dropDownButtonStyle || styles.dropDownButton} onPress={() => setOpen(!open)}>
+                <Text style={dropDownTextStyle || styles.dropDownText}>{value || title || 'Categorize by'}</Text>
+                <Icon name={open ? 'chevron-down-outline' : 'chevron-back'} color="#888888" size={18} />
             </TouchableOpacity>
             {open && (
-                <View style={styles.optionsContainer}>
-                    {options.map((option) => (
-                        <Option
-                            key={option.value}
-                            label={option.label}
-                            value={option.value}
+                <View style={optionsContainerStyle || styles.optionsContainer}>
+                    <FlatList
+                        data={options}
+                        renderItem={({ item }) => (<Option
+                            key={item.value}
+                            label={item.symbol + '    ' + item.label}
+                            value={item.value}
                             setValue={setValue}
                             setOpen={setOpen}
-                        />
-                    ))}
+                            optionsTextStyle={optionsTextStyle}
+                            dropDownButtonStyle={dropDownButtonStyle}
+                        />)}
+                        nestedScrollEnabled={true}
+                        
+                    />
                 </View>
             )}
         </View>
     )
 }
 
-const Option = ({ label, value, setValue, setOpen }) => {
+const Option = ({ label, value, setValue, setOpen, dropDownButtonStyle, optionsTextStyle }) => {
     const handlePress = () => {
         setValue(value);
         setOpen(false);
     };
     return (
-        <TouchableOpacity style={styles.dropDownButton} onPress={handlePress}>
-            <Text style={styles.optionsText}>{label}</Text>
+        <TouchableOpacity style={[dropDownButtonStyle || styles.dropDownButton, {borderTopWidth: 1, borderTopColor: '#eee'}]} onPress={handlePress}>
+            <Text style={optionsTextStyle || styles.optionsText}>{label}</Text>
         </TouchableOpacity>
     );
 };
@@ -45,32 +50,33 @@ export default DropDown
 
 const styles = StyleSheet.create({
     dropDownContainer: {
-        backgroundColor: '#368984',
-        width: 145,
-        borderRadius: 5,
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 14,
         overflow: 'hidden',
         position: 'absolute',
-        top: 100,
-        right: '2.5%',
         zIndex: 1000,
     },
     dropDownButton: {
-        width: 145,
-        backgroundColor: '#24706bff',
-        padding: 10,
+        height: 54,
+        gap: 10,
+        paddingHorizontal: 10,
+        backgroundColor: '#fff',
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
     },
     dropDownText: {
-        color: '#FFFFFF',
+        color: '#555555',
         fontSize: 15,
         fontWeight: '700',
     },
     optionsContainer: {
-        backgroundColor: '#368984',
+        backgroundColor: '#fff',
     },
     optionsText: {
-        color: '#FFFFFF',
+        color: '#999999',
         fontSize: 14,
     },
 })
