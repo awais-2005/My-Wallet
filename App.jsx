@@ -20,6 +20,7 @@ import AddProfilePhotoScreen from './src/screens/AddProfilePhotoScreen';
 import ChangeCurrencyScreen from './src/screens/ChangeCurrencyScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import AboutAppScreen from './src/screens/AboutAppScreen';
+import BackupScreen from './src/screens/BackupScreen';
 
 export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
@@ -65,6 +66,7 @@ const SettingsStackNavigator = () => {
       <Stack.Screen name="settingsScreen" component={SettingsScreen} />
       <Stack.Screen name="changeCurrency" component={ChangeCurrencyScreen}/>
       <Stack.Screen name="editProfile" component={EditProfileScreen} />
+      <Stack.Screen name="backup" component={BackupScreen} />
       <Stack.Screen name="aboutApp" component={AboutAppScreen} />
     </Stack.Navigator>
   )

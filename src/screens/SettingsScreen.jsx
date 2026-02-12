@@ -28,7 +28,7 @@ const SettingsScreen = ({ navigation }) => {
   const optionsList = [
     options(1, 'Edit username', 'user-pen', 20, 3, 'editProfile', navigation.navigate),
     options(2, 'Change Currency', 'dollar', 30, 1, 'changeCurrency', navigation.navigate),
-    options(3, 'Backup Data (Coming Soon)', 'backup', 24, 2),
+    options(3, 'Backup Data (Coming Soon)', 'backup', 24, 2, 'backup', navigation.navigate),
     options(4, 'About App', 'information-circle', 24, 4, 'aboutApp', navigation.navigate),
   ];
   

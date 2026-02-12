@@ -8,7 +8,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { lightTheme, themeColor } from '../config/theme';
 export let allTransactions = [];
 
-
 export default function HomeScreen({ navigation }) {
   
   const hei = screenHeight - 500;
@@ -100,12 +99,12 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
       <View style={styles.txSeeAllBlock}>
-        <Text style={styles.blockLabel}>Transactions History</Text>
+        <Text style={styles.blockLabel}>Recent Transactions</Text>
         {(context.listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => {navigation.navigate('History')}} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
       </View>
       <ScrollView style={styles.listOfTransactions} >
         {
-          (context.listOfTransactions.length === 0) && (<EmptyMessage key="emptyMessge" marginTop={30} message="No Transaction Found" />) ||
+          (context.listOfTransactions.length === 0) && (<EmptyMessage marginTop={30} message="No Transaction Found" />) ||
           ((context.listOfTransactions.length > Math.floor(hei / 55)) && (context.listOfTransactions.slice(0, Math.floor(hei / 55)).map((tx) => <TransactionCard key={tx.id} transObj={tx} />))) ||
           (context.listOfTransactions.map((tx) => <TransactionCard key={tx.id} transObj={tx} />))
         }
