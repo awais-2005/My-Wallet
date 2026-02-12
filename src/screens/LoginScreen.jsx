@@ -90,7 +90,7 @@ const LoginScreen = ({ navigation }) => {
           />
           <TouchableOpacity onPress={() => setSecure(!secure)}>
             <Icon
-              name={secure ? 'eye-outline' : 'eye-off-outline'}
+              name={!secure ? 'eye-outline' : 'eye-off-outline'}
               size={20}
               color="#9CA3AF"
             />
