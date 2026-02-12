@@ -7,12 +7,14 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { storage, TransactionContext } from '../context/TransactionContext';
 import register from '../utils/register';
 import login from '../utils/login';
 import LoadingAnimation from '../../components/LoadingAnimation';
+import { screenHeight } from '../../App';
 
 const RegisterScreen = ({ navigation }) => {
 
@@ -25,6 +27,7 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const handleAccountCreation = async () => {
     try {
       if([name, email, password, confirmPassword].some( f => !f.trim())) {
@@ -62,6 +65,7 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+
       {/* Back Arrow */}
       <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack()}>
         <Icon name="arrow-back" size={22} color="#0F172A" />
@@ -80,74 +84,75 @@ const RegisterScreen = ({ navigation }) => {
         Start tracking your expenses today.
       </Text>
 
-      {/* Full Name */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          placeholder="e.g. John Doe"
-          placeholderTextColor="#9CA3AF"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-        />
-      </View>
-
-      {/* Email */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          placeholder="name@example.com"
-          placeholderTextColor="#9CA3AF"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-        />
-      </View>
-
-      {/* Password */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.passwordWrapper}>
+      <ScrollView>
+        {/* Full Name */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Full Name</Text>
           <TextInput
-            placeholder="Create a password"
+            placeholder="e.g. John Doe"
             placeholderTextColor="#9CA3AF"
-            secureTextEntry={secure1}
-            value={password}
-            onChangeText={setPassword}
-            style={styles.passwordInput}
+            value={name}
+            onChangeText={setName}
+            style={styles.input}
           />
-          <TouchableOpacity onPress={() => setSecure1(!secure1)}>
-            <Icon
-              name={secure1 ? 'eye-outline' : 'eye-off-outline'}
-              size={20}
-              color="#9CA3AF"
-            />
-          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Confirm Password */}
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Confirm Password</Text>
-        <View style={styles.passwordWrapper}>
+        {/* Email */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email Address</Text>
           <TextInput
-            placeholder="Re-enter password"
+            placeholder="name@example.com"
             placeholderTextColor="#9CA3AF"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={secure2}
-            style={styles.passwordInput}
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
           />
-          <TouchableOpacity onPress={() => setSecure2(!secure2)}>
-            <Icon
-              name={secure2 ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#9CA3AF"
-            />
-          </TouchableOpacity>
         </View>
-      </View>
 
+        {/* Password */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordWrapper}>
+            <TextInput
+              placeholder="Create a password"
+              placeholderTextColor="#9CA3AF"
+              secureTextEntry={secure1}
+              value={password}
+              onChangeText={setPassword}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity onPress={() => setSecure1(!secure1)}>
+              <Icon
+                name={!secure1 ? 'eye-outline' : 'eye-off-outline'}
+                size={20}
+                color="#9CA3AF"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Confirm Password */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={styles.passwordWrapper}>
+            <TextInput
+              placeholder="Re-enter password"
+              placeholderTextColor="#9CA3AF"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={secure2}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity onPress={() => setSecure2(!secure2)}>
+              <Icon
+                name={secure2 ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color="#9CA3AF"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
       {/* Button */}
       <TouchableOpacity style={styles.button} onPress={handleAccountCreation}>
         <Text style={styles.buttonText}>Create Account</Text>
@@ -169,7 +174,7 @@ export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: (screenHeight - 30) || '100%',
     backgroundColor: '#F8FAF9',
     paddingHorizontal: 24,
   },
@@ -225,8 +230,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 15,
     backgroundColor: '#FFFFFF',
+    color: '#4c4c4c',
   },
-
+  
+  currencyWrapper: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  
   passwordWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -240,6 +251,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     fontSize: 15,
+    color: '#4c4c4c',
   },
 
   button: {
