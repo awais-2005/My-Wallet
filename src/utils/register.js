@@ -1,6 +1,6 @@
 import { API_KEY, SERVER_URL } from "../config/constants";
 
-export default async function register(name, email, password) {
+export default async function register(name, email, currency, password) {
     return await fetch(`${SERVER_URL}/auth/register`, {
         method: "POST",
         headers: {
@@ -10,6 +10,7 @@ export default async function register(name, email, password) {
         body: JSON.stringify({
             name,
             email,
+            currency,
             password,
         })
     });

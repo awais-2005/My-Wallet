@@ -28,6 +28,8 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const DEFAULT_CURRENCY = "PKR";
+
   const handleAccountCreation = async () => {
     try {
       if([name, email, password, confirmPassword].some( f => !f.trim())) {
@@ -36,7 +38,7 @@ const RegisterScreen = ({ navigation }) => {
       }
       if (password !== confirmPassword) throw new Error("Password confirmation failed");
       setLoading(true);
-      const registerResponse = await register(name.trim(), email.trim(), password.trim());
+      const registerResponse = await register(name.trim(), email.trim(), DEFAULT_CURRENCY, password.trim());
       if (!registerResponse.ok) {
         const data = await registerResponse.json();
         throw new Error("Register Api failure: " + JSON.stringify(data));
@@ -50,6 +52,7 @@ const RegisterScreen = ({ navigation }) => {
       user.id = id;
       user.name = name;
       user.email = email;
+      user.currency = DEFAULT_CURRENCY;
       user.token = token;
       setUser({...user});
       storage.set('user', JSON.stringify(user));
