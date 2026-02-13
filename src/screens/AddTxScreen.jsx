@@ -8,11 +8,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Navbar from '../../components/Navbar';
 import { TransactionContext } from '../context/TransactionContext';
+import { useCurrencyInfo } from '../hooks/useCurrencyInfo';
 
 function AddTxScreen({ navigation }) {
 
     const context = useContext(TransactionContext);
-
+    const { multiplyer } = useCurrencyInfo();
     const [open2, setOpen2] = useState(false);
     const [value2, setValue2] = useState('Expense');
     const [items2, setItems2] = useState([
@@ -144,7 +145,7 @@ function AddTxScreen({ navigation }) {
                 id: getID(),
                 title: txTitle,
                 type: value2 === 'Expense' ? value : value2,
-                amount: value2 === 'Expense' ? -Number(txAmount) : Number(txAmount), // make a validator
+                amount: value2 === 'Expense' ? -Number(txAmount) / multiplyer : Number(txAmount) / multiplyer, // make a validator
                 date: getTimeStamp(),
             }
         );

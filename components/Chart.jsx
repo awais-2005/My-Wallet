@@ -2,18 +2,19 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { formatAmount } from '../src/screens/HomeScreen';
+import { useCurrencyInfo } from '../src/hooks/useCurrencyInfo';
 
 const Chart = ({ data }) => {
   // Calculate max value dynamically from data
   const maxSpent = typeof(data) !== 'string' ? Math.max(...data.map(item => item.spent)) : 0;
   const barWidth = 60;
-
+  const { multiplyer } = useCurrencyInfo();
+  
   const Bar = ({ item }) => {
     const barHeight = (item.spent / maxSpent) * 250; // 250 is max height
-
     return (
       <View style={[styles.barContainer, { width: barWidth }]}>
-        <Text style={styles.spentLabel}>{formatAmount(item.spent, 0)}</Text>
+        <Text style={styles.spentLabel}>{formatAmount(item.spent * multiplyer, 1)}</Text>
         <View style={[styles.bar, { height: barHeight }]} />
         <Text style={styles.label}>{item.label}</Text>
       </View>

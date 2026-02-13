@@ -31,6 +31,7 @@ export default function TxContextProvider({ children }) {
 
     useEffect(() => {
         console.log("user updated", user);
+        storage.set('user', JSON.stringify(user));
     }, [user])    
 
     const addNewTransaction = useCallback((newTransaction, showAlert = true) => {

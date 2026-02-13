@@ -2,8 +2,12 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatAmount } from '../src/screens/HomeScreen';
 import { getIcon } from './EditableTxCard';
+import { useCurrencyInfo } from '../src/hooks/useCurrencyInfo';
 
 export default function TransactionCard(props) {
+
+    const { symbol, multiplyer } = useCurrencyInfo();
+    
     let amountSpent = props.transObj.amount;
     let color = amountSpent > 0 ? '#34bb51ff' : '#fd4e4eff';
     let sign = amountSpent > 0 ? '+' : '-';
@@ -15,7 +19,7 @@ export default function TransactionCard(props) {
                 <Text style={styles.title}>{props.transObj.title}</Text>
                 <Text style={styles.timeStamp}>{getDuration(props.transObj.date)}</Text>
             </View>
-            <Text style={[styles.amount, {color: color}]}>{sign} Rs {formatAmount(amountSpent)}</Text>
+            <Text style={[styles.amount, {color: color}]}>{sign} {symbol} {formatAmount(amountSpent*multiplyer)}</Text>
         </View>
     );
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import EmptyMessage from '../../components/EmptyMessage';
 import TransactionCard from '../../components/TransactionCard';
@@ -6,10 +6,11 @@ import { screenHeight } from '../../App';
 import { TransactionContext } from '../context/TransactionContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { lightTheme, themeColor } from '../config/theme';
+import { useCurrencyInfo } from '../hooks/useCurrencyInfo';
 export let allTransactions = [];
 
 export default function HomeScreen({ navigation }) {
-  
+
   const hei = screenHeight - 500;
 
   const [overviewCardType, setOverviewCardType] = useState('monthly');
@@ -24,7 +25,7 @@ export default function HomeScreen({ navigation }) {
     let total = 0;
     let spent = 0;
     let inWallet = 0;
-    if(overviewCardType === 'allTime') {
+    if (overviewCardType === 'allTime') {
       context.listOfTransactions.forEach((tx) => {
         total += tx.amount > 0 ? tx.amount : 0;
         spent += tx.amount < 0 ? tx.amount : 0;
@@ -45,6 +46,8 @@ export default function HomeScreen({ navigation }) {
     setInWallet(inWallet);
   }, [context.listOfTransactions, overviewCardType, context.currentMonthTransactions]);
 
+  const { symbol, multiplyer } = useCurrencyInfo();
+
   const [totalBalance, setTotalBalance] = useState(0);
   const [totalSpent, setSpent] = useState(0);
   const [totalInWallet, setInWallet] = useState(0);
@@ -56,7 +59,7 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.topBgShape} />
       <View style={styles.header}>
         {context.user.avatar && (<View style={styles.profileContainer}>
-          <Image source={{uri: context.user.avatar}} height={50} width={50} resizeMode='cover' />
+          <Image source={{ uri: context.user.avatar }} height={50} width={50} resizeMode='cover' />
         </View>)}
         <View style={styles.greetingBlock}>
           <Text style={styles.greeting}>{getGreeting()}</Text>
@@ -64,8 +67,8 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
       <View style={styles.overviewCard}>
-        <TouchableOpacity style={styles.option} disabled={false} onPress={() => {setShowOptions(!showOptions)}}>
-          <Ionicons name={showOptions ? "close" : "ellipsis-vertical"} size={20} color={'#fff'}/>
+        <TouchableOpacity style={styles.option} disabled={false} onPress={() => { setShowOptions(!showOptions) }}>
+          <Ionicons name={showOptions ? "close" : "ellipsis-vertical"} size={20} color={'#fff'} />
         </TouchableOpacity>
         {showOptions && (
           <View style={styles.optionContainer}>
@@ -85,22 +88,22 @@ export default function HomeScreen({ navigation }) {
         )}
         <View style={styles.totalBlock}>
           <Text style={styles.title}>In Wallet</Text>
-          <Text style={styles.totalAmount}>Rs {formatAmount(totalInWallet)}</Text>
+          <Text style={styles.totalAmount}>{symbol} {formatAmount(totalInWallet*multiplyer)}</Text>
         </View>
         <View style={styles.lowerBlock}>
           <View style={styles.walletBlock}>
             <Text style={styles.title}>Total Received</Text>
-            <Text style={styles.walletAmount}>Rs {formatAmount(totalBalance)}</Text>
+            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalBalance*multiplyer)}</Text>
           </View>
           <View style={styles.walletBlock}>
             <Text style={styles.title}>Spent</Text>
-            <Text style={styles.walletAmount}>Rs {formatAmount(totalSpent)}</Text>
+            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalSpent*multiplyer)}</Text>
           </View>
         </View>
       </View>
       <View style={styles.txSeeAllBlock}>
         <Text style={styles.blockLabel}>Recent Transactions</Text>
-        {(context.listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => {navigation.navigate('History')}} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
+        {(context.listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => { navigation.navigate('History') }} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
       </View>
       <ScrollView style={styles.listOfTransactions} >
         {
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 100,
     overflow: 'hidden',
-  },  
+  },
   title: {
     fontSize: 15,
     color: '#fff',

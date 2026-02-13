@@ -7,9 +7,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getDuration } from './TransactionCard';
 import { TransactionContext } from '../src/context/TransactionContext';
+import { useCurrencyInfo } from '../src/hooks/useCurrencyInfo';
 
 export default function EditableTxCard({ item }) {
- 
+    const { symbol, multiplyer } = useCurrencyInfo();
     const {
         deleteTransaction,
         navigation,
@@ -43,7 +44,7 @@ export default function EditableTxCard({ item }) {
                 <Text style={styles.timeStamp}>{getDuration(item.date)}</Text>
             </View>
             <View style={styles.amountAndActionsBlock}>
-                <Text style={[styles.amount, { color: color }]}>{sign} Rs {formatAmount(amountSpent)}</Text>
+                <Text style={[styles.amount, { color: color }]}>{sign} {symbol} {formatAmount(amountSpent*multiplyer)}</Text>
                 <View style={styles.actions}>
                     <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => {
                         

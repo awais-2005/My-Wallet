@@ -87,7 +87,6 @@ const RegisterScreen = ({ navigation }) => {
         Start tracking your expenses today.
       </Text>
 
-      <ScrollView>
         {/* Full Name */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Full Name</Text>
@@ -155,7 +154,7 @@ const RegisterScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+
       {/* Button */}
       <TouchableOpacity style={styles.button} onPress={handleAccountCreation}>
         <Text style={styles.buttonText}>Create Account</Text>
@@ -177,7 +176,7 @@ export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
-    height: (screenHeight - 30) || '100%',
+    height: '100%',
     backgroundColor: '#F8FAF9',
     paddingHorizontal: 24,
   },

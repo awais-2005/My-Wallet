@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,12 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { TransactionContext } from '../context/TransactionContext';
+import { setCurrency } from '../utils/setCurrency';
+import LoadingAnimation from '../../components/LoadingAnimation';
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', symbol: '$' },
@@ -17,8 +21,37 @@ const CURRENCIES = [
   { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
 ];
 
+const symbols = {
+  INR: '₹',
+  PKR: '₨',
+  GBP: '£',
+  USD: '$',
+  EUR: '€',
+}
+
 const ChangeCurrencyScreen = ({ navigation }) => {
-  const [selected, setSelected] = useState('PKR');
+
+  const {user, setUser} = useContext(TransactionContext);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(user.currency ?? 'PKR');
+  
+  const handleSave = async () => {
+    if(selected !== user.currency) {
+      setLoading(true);
+      try {
+        const res = await setCurrency(user.id, selected);
+        const data = res.json();
+        console.log(data);
+        user.currency = selected;
+        setUser({ ...user });
+      } catch (err) {
+        Alert.alert('Failed', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    navigation.canGoBack() && navigation.goBack();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,9 +104,10 @@ const ChangeCurrencyScreen = ({ navigation }) => {
       />
 
       {/* Save */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save Currency</Text>
       </TouchableOpacity>
+      {loading && (<LoadingAnimation message={'Saving Changes...'}/>)}
     </SafeAreaView>
   );
 };
