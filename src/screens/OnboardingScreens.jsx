@@ -21,7 +21,7 @@ const OnboardingScreen1 = ({ navigation }) => {
           <Text style={styles.subText} >Track your every penny and gain control over your financial life.</Text>
         </View>
 
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("screen2")}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.replace("screen2")}>
         <Text style={styles.nextButtonText} >Next</Text>
       </TouchableOpacity>
     </View>
@@ -46,7 +46,7 @@ const OnboardingScreen2 = ({ navigation }) => {
             />
         </View>
 
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate("screen3")}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.replace("screen3")}>
         <Text style={styles.nextButtonText} >Next</Text>
       </TouchableOpacity>
     </View>
@@ -74,7 +74,7 @@ const OnboardingScreen3 = ({ navigation }) => {
 
       <TouchableOpacity style={styles.nextButton} onPress={() => {
         storage.set('newUserCheck', false);
-        navigation.navigate("login");
+        navigation.replace("login");
         }}>
         <Text style={styles.nextButtonText} >Get Started</Text>
       </TouchableOpacity>

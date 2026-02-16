@@ -28,6 +28,9 @@ const LoginScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const response1 = await login(email.trim(), password.trim());
+      if(!response1.ok) {
+        throw new Error('Invalid credentials')
+      }
       const { id, token } = await response1.json();
 
       const response2 = await getUserById(id);
@@ -39,7 +42,7 @@ const LoginScreen = ({ navigation }) => {
       };
       storage.set('user', JSON.stringify(user));
       setUser(user);
-      navigation.navigate("mainApp");
+      navigation.replace("mainApp");
     } catch (err) {
       console.log(err);
       setLoading(false);
