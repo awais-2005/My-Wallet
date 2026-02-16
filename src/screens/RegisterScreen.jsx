@@ -56,7 +56,7 @@ const RegisterScreen = ({ navigation }) => {
       user.token = token;
       setUser({...user});
       storage.set('user', JSON.stringify(user));
-      navigation.navigate('addProfile');
+      navigation.replace('addProfile');
     } catch (err) {
       console.log(err);
       setLoading(false);
