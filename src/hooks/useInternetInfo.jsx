@@ -1,16 +1,19 @@
 import NetInfo from '@react-native-community/netinfo'
 import { useEffect, useState } from 'react'
 export const useInternetConnection = () => {
-    const [connection, setConnection] = useState(true);
+    const [connectionDetails, setConnectionDetails] = useState({});
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener((state) => {
             console.log(state);
-            setConnection(state.isConnected && state.isInternetReachable);
+            setConnectionDetails({
+                isConnected: state.isConnected && state.isInternetReachable,
+                type: state.type,
+            });
         })
 
         return unsubscribe
     }, []);
 
-    return connection;
+    return connectionDetails;
 }
