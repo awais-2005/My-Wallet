@@ -40,8 +40,8 @@ export default function EditableTxCard({ item }) {
         <View style={[styles.card, {backgroundColor: cardBg}]}>
             {getIcon(item.type, null, 32)}
             <View style={styles.textBlock}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.timeStamp}>{getDuration(item.date)}</Text>
+                <Text style={styles.title}>{item.description  || item.title}</Text>
+                <Text style={styles.timeStamp}>{getDuration(item.created_at)}</Text>
             </View>
             <View style={styles.amountAndActionsBlock}>
                 <Text style={[styles.amount, { color: color }]}>{sign} {symbol} {formatAmount(amountSpent*multiplyer)}</Text>

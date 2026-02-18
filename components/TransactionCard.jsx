@@ -16,8 +16,8 @@ export default function TransactionCard(props) {
         <View style={styles.card}>
             {getIcon(props.transObj.type, styles.logo, 25)}
             <View style={styles.textBlock}>
-                <Text style={styles.title}>{props.transObj.title}</Text>
-                <Text style={styles.timeStamp}>{getDuration(props.transObj.date)}</Text>
+                <Text style={styles.title}>{props.transObj.description || props.transObj.title}</Text>
+                <Text style={styles.timeStamp}>{getDuration(props.transObj.created_at)}</Text>
             </View>
             <Text style={[styles.amount, {color: color}]}>{sign} {symbol} {formatAmount(amountSpent*multiplyer)}</Text>
         </View>
