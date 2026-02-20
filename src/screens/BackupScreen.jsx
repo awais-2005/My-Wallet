@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
+    Alert,
     View,
     Text,
     StyleSheet,
@@ -9,13 +10,61 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { themeColor } from '../config/theme';
+import { storage, TransactionContext } from '../context/TransactionContext';
+import { useInternetConnection } from '../hooks/useInternetInfo';
 
 const BackupScreen = ({ navigation }) => {
-    // Replace with real DB query
-    const nonBackedUpCount = 12;
 
-    const [autoBackup, setAutoBackup] = useState(true);
-    const [networkType, setNetworkType] = useState('wifi'); // 'wifi' | 'cellular'
+    const { listOfTransactions, syncPendingTransactions } = useContext(TransactionContext);
+    const connection = useInternetConnection();
+    const [syncing, setSyncing] = useState(false);
+
+    useEffect(() => {
+        try {
+            const data = storage.getString('pendingQueue');
+            const pendingQueue = data ? JSON.parse(data) : [];
+            setNonBackedUpCount(Array.isArray(pendingQueue) ? pendingQueue.length : 0);
+        } catch (err) {
+            setNonBackedUpCount(0);
+        }
+    }, [listOfTransactions]);
+
+    const [nonBackedUpCount, setNonBackedUpCount] = useState(0);
+    const [networkType, setNetworkType] = useState(() => {
+        const value = storage.getString('networkType');
+        return value === 'cellular' ? 'wifiOrCellular' : (value ?? 'wifi');
+    }); // 'wifi' | 'wifiOrCellular'
+    const [autoBackup, setAutoBackup] = useState(storage.getBoolean('autoBackup') ?? true);
+
+    useEffect(() => {
+        storage.set('autoBackup', autoBackup);
+    }, [autoBackup]);
+
+    useEffect(() => {
+        storage.set('networkType', networkType);
+    }, [networkType]);
+
+    const handleBackupNow = async () => {
+        if (syncing) return;
+        if (!connection.isConnected) {
+            Alert.alert('No Internet', 'Connect to internet and try again.');
+            return;
+        }
+
+        try {
+            setSyncing(true);
+            const result = await syncPendingTransactions();
+            if (result?.syncedCount > 0) {
+                Alert.alert('Success', `${result.syncedCount} transaction(s) backed up.`);
+            } else {
+                Alert.alert('Up to Date', 'No pending transactions to backup.');
+            }
+        } catch (err) {
+            Alert.alert('Backup Failed', err?.message || 'Unable to backup transactions.');
+        } finally {
+            setSyncing(false);
+        }
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -30,7 +79,7 @@ const BackupScreen = ({ navigation }) => {
             <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Pending Backups</Text>
                 <Text style={styles.pendingCount}>
-                    {nonBackedUpCount} transactions not backed up
+                    {nonBackedUpCount > 0 ? `${nonBackedUpCount} transactions not backed up` : 'Your transactions are up to date'}
                 </Text>
             </View>
 
@@ -78,14 +127,14 @@ const BackupScreen = ({ navigation }) => {
                 <TouchableOpacity
                     style={[
                         styles.option,
-                        networkType === 'cellular' && styles.optionSelected,
+                        networkType === 'wifiOrCellular' && styles.optionSelected,
                     ]}
-                    onPress={() => setNetworkType('cellular')}
+                    onPress={() => setNetworkType('wifiOrCellular')}
                 >
                     <Text
                         style={[
                             styles.optionText,
-                            networkType === 'cellular' && styles.optionTextSelected,
+                            networkType === 'wifiOrCellular' && styles.optionTextSelected,
                         ]}
                     >
                         Wi-Fi + Cellular
@@ -94,8 +143,8 @@ const BackupScreen = ({ navigation }) => {
             </View>
 
             {/* Manual Backup Button */}
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Backup Now</Text>
+            <TouchableOpacity style={[styles.button, syncing && styles.buttonDisabled]} onPress={handleBackupNow} disabled={syncing}>
+                <Text style={styles.buttonText}>{syncing ? 'Backing up...' : 'Backup Now'}</Text>
             </TouchableOpacity>
         </ScrollView>
     );
@@ -178,6 +227,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: themeColor,
         alignItems: 'center',
+    },
+    buttonDisabled: {
+        opacity: 0.65,
     },
     buttonText: {
         color: '#fff',
