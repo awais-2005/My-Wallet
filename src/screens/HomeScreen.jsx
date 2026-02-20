@@ -1,13 +1,20 @@
-import { useContext, useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import EmptyMessage from '../../components/EmptyMessage';
 import TransactionCard from '../../components/TransactionCard';
 import { screenHeight } from '../../App';
-import { TransactionContext } from '../context/TransactionContext';
+import { storage, TransactionContext } from '../context/TransactionContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { lightTheme, themeColor } from '../config/theme';
 import { useCurrencyInfo } from '../hooks/useCurrencyInfo';
+import { useInternetConnection } from '../hooks/useInternetInfo';
 export let allTransactions = [];
+
+const isNetworkAllowedForBackup = (networkType, activeConnectionType) => {
+  if (networkType === 'wifi') return activeConnectionType === 'wifi';
+  if (networkType === 'wifiOrCellular') return activeConnectionType === 'wifi' || activeConnectionType === 'cellular';
+  return false;
+}
 
 export default function HomeScreen({ navigation }) {
 
@@ -16,35 +23,43 @@ export default function HomeScreen({ navigation }) {
   const [overviewCardType, setOverviewCardType] = useState('monthly');
 
   const context = useContext(TransactionContext);
-  console.log(context.listOfTransactions)
+  const {
+    setNavigation,
+    listOfTransactions,
+    currentMonthTransactions,
+    user,
+    syncPendingTransactions,
+  } = context;
+
+  console.log(listOfTransactions)
   useEffect(() => {
-    context.setNavigation(navigation);
-  }, [context, navigation]);
+    setNavigation(navigation);
+  }, [setNavigation, navigation]);
 
   useEffect(() => {
     let total = 0;
     let spent = 0;
     let inWallet = 0;
     if (overviewCardType === 'allTime') {
-      context.listOfTransactions.forEach((tx) => {
+      listOfTransactions.forEach((tx) => {
         total += tx.amount > 0 ? tx.amount : 0;
         spent += tx.amount < 0 ? tx.amount : 0;
         inWallet += tx.amount;
       });
     }
     else {
-      context.currentMonthTransactions.forEach((tx) => {
+      currentMonthTransactions.forEach((tx) => {
         total += tx.amount > 0 ? tx.amount : 0;
         spent += tx.amount < 0 ? tx.amount : 0;
       });
-      context.listOfTransactions.forEach((tx) => {
+      listOfTransactions.forEach((tx) => {
         inWallet += tx.amount;
       });
     }
     setTotalBalance(total);
     setSpent(spent === 0 ? spent : -spent);
     setInWallet(inWallet);
-  }, [context.listOfTransactions, overviewCardType, context.currentMonthTransactions]);
+  }, [currentMonthTransactions, listOfTransactions, overviewCardType]);
 
   const { symbol, multiplyer } = useCurrencyInfo();
 
@@ -52,18 +67,47 @@ export default function HomeScreen({ navigation }) {
   const [totalSpent, setSpent] = useState(0);
   const [totalInWallet, setInWallet] = useState(0);
   const [showOptions, setShowOptions] = useState(false);
+  const connection = useInternetConnection();
+  const [saving, setSaving] = useState(false);
+  const syncInProgressRef = useRef(false);
 
+  const syncPendingQueue = useCallback(async () => {
+    if (syncInProgressRef.current) return;
+    syncInProgressRef.current = true;
+    setSaving(true);
+    try {
+      await syncPendingTransactions();
+    } catch (err) {
+      Alert.alert('Backup Failed', err?.message || 'Unable to backup pending transactions right now.');
+    } finally {
+      setSaving(false);
+      syncInProgressRef.current = false;
+    }
+  }, [syncPendingTransactions]);
+
+  useEffect(() => {
+    const autoBackup = storage.getBoolean('autoBackup') ?? true;
+    const rawNetworkType = storage.getString('networkType');
+    const networkType = rawNetworkType === 'cellular' ? 'wifiOrCellular' : (rawNetworkType ?? 'wifi');
+
+    if (!autoBackup) return;
+    if (!connection.isConnected) return;
+    if (!isNetworkAllowedForBackup(networkType, connection.type)) return;
+    if (!user?.token) return;
+
+    syncPendingQueue();
+  }, [connection.isConnected, connection.type, listOfTransactions.length, syncPendingQueue, user?.token]);
 
   return (
     <View style={styles.main}>
       <View style={styles.topBgShape} />
       <View style={styles.header}>
-        {context.user.avatar && (<View style={styles.profileContainer}>
-          <Image source={{ uri: context.user.avatar }} height={50} width={50} resizeMode='cover' />
+        {user.avatar && (<View style={styles.profileContainer}>
+          <Image source={{ uri: user.avatar }} height={50} width={50} resizeMode='cover' />
         </View>)}
         <View style={styles.greetingBlock}>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
-          <Text style={styles.name}>{context.user.name || "xyz"}</Text>
+          <Text style={styles.greeting}>{saving ? 'Saving pendings' : getGreeting()}</Text>
+          <Text style={styles.name}>{user.name || "Unknown"}</Text>
         </View>
       </View>
       <View style={styles.overviewCard}>
@@ -88,28 +132,28 @@ export default function HomeScreen({ navigation }) {
         )}
         <View style={styles.totalBlock}>
           <Text style={styles.title}>In Wallet</Text>
-          <Text style={styles.totalAmount}>{symbol} {formatAmount(totalInWallet*multiplyer)}</Text>
+          <Text style={styles.totalAmount}>{symbol} {formatAmount(totalInWallet * multiplyer)}</Text>
         </View>
         <View style={styles.lowerBlock}>
           <View style={styles.walletBlock}>
             <Text style={styles.title}>Total Received</Text>
-            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalBalance*multiplyer)}</Text>
+            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalBalance * multiplyer)}</Text>
           </View>
           <View style={styles.walletBlock}>
             <Text style={styles.title}>Spent</Text>
-            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalSpent*multiplyer)}</Text>
+            <Text style={styles.walletAmount}>{symbol} {formatAmount(totalSpent * multiplyer)}</Text>
           </View>
         </View>
       </View>
       <View style={styles.txSeeAllBlock}>
         <Text style={styles.blockLabel}>Recent Transactions</Text>
-        {(context.listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => { navigation.navigate('History') }} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
+        {(listOfTransactions.length > 0) && (<TouchableOpacity style={styles.seeAllButton} onPress={() => { navigation.navigate('History') }} ><Text style={styles.seeAllText}>See all</Text></TouchableOpacity>)}
       </View>
       <ScrollView style={styles.listOfTransactions} >
         {
-          (context.listOfTransactions.length === 0) && (<EmptyMessage marginTop={30} message="No Transaction Found" />) ||
-          ((context.listOfTransactions.length > Math.floor(hei / 55)) && (context.listOfTransactions.slice(0, Math.floor(hei / 55)).map((tx) => <TransactionCard key={tx.id} transObj={tx} />))) ||
-          (context.listOfTransactions.map((tx) => <TransactionCard key={tx.id} transObj={tx} />))
+          (listOfTransactions.length === 0) && (<EmptyMessage marginTop={30} message="No Transaction Found" />) ||
+          ((listOfTransactions.length > Math.floor(hei / 55)) && (listOfTransactions.slice(0, Math.floor(hei / 55)).map((tx) => <TransactionCard key={tx.id} transObj={tx} />))) ||
+          (listOfTransactions.map((tx) => <TransactionCard key={tx.id} transObj={tx} />))
         }
       </ScrollView>
     </View>
