@@ -13,10 +13,11 @@ import login from '../utils/login';
 import { storage, TransactionContext } from '../context/TransactionContext';
 import getUserById from '../utils/getUserById';
 import LoadingAnimation from '../../components/LoadingAnimation';
+import { fetchTransactions } from '../utils/saveTransaction';
 
 const LoginScreen = ({ navigation }) => {
   const [secure, setSecure] = useState(true);
-  const { setUser } = useContext(TransactionContext);
+  const { setUser, setListOfTransactions } = useContext(TransactionContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,12 @@ const LoginScreen = ({ navigation }) => {
         ...data,
         token
       };
+
+      const transactions = await fetchTransactions(user.token);
+      const reversed = transactions.reverse();
+      storage.set('transactions', JSON.stringify(reversed));
+      setListOfTransactions(reversed);
+
       storage.set('user', JSON.stringify(user));
       setUser(user);
       navigation.replace("mainApp");
