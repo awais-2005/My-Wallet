@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useContext, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -9,11 +9,15 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import Navbar from '../../components/Navbar';
 import { TransactionContext } from '../context/TransactionContext';
 import { useCurrencyInfo } from '../hooks/useCurrencyInfo';
+import { createNewTransaction } from '../utils/saveTransaction';
+import { useInternetConnection } from '../hooks/useInternetInfo';
 
 function AddTxScreen({ navigation }) {
 
     const context = useContext(TransactionContext);
     const { multiplyer } = useCurrencyInfo();
+    const { isConnected } = useInternetConnection();
+    const [loading, setLoading] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [value2, setValue2] = useState('Expense');
     const [items2, setItems2] = useState([
@@ -126,29 +130,46 @@ function AddTxScreen({ navigation }) {
     ]);
 
     const [txTitle, setTxTitle] = useState('');
-    const [txAmount, setTxAmount] = useState(0);
+    const [txAmount, setTxAmount] = useState('');
 
     const resetState = () => {
         setOpen(false);
         setOpen2(false);
-        setValue(null);
-        setValue2(null);
-        setTxTitle(null);
-        setTxAmount(null);
-        console.log('resetState Called');
+        setValue('Food');
+        setValue2('Expense');
+        setTxTitle('');
+        setTxAmount('');
     };
 
-    const handleSave = () => {
-        if (!txTitle || !txAmount || (value2 === 'Expense' ? (!value || !value2) : !value2)) { return; }
-        context.addNewTransaction(
-            {
-                id: getID(),
-                title: txTitle,
-                type: value2 === 'Expense' ? value : value2,
-                amount: value2 === 'Expense' ? -Number(txAmount) / multiplyer : Number(txAmount) / multiplyer, // make a validator
-                date: getTimeStamp(),
+    const handleSave = async () => {
+        const normalizedTitle = txTitle?.trim();
+        const normalizedAmount = Number(txAmount);
+        if (!normalizedTitle || !Number.isFinite(normalizedAmount) || normalizedAmount <= 0 || (value2 === 'Expense' ? (!value || !value2) : !value2)) { return; }
+
+        const tx = {
+            id: getID(),
+            description: normalizedTitle,
+            type: value2 === 'Expense' ? value : value2,
+            amount: value2 === 'Expense' ? -normalizedAmount / multiplyer : normalizedAmount / multiplyer,
+            isBackedup: false,
+            created_at: getTimeStamp(),
+        }
+        if (isConnected && context.user?.token) {
+            try {
+                setLoading(true);
+                const data = await createNewTransaction(tx, context.user.token);
+                if (data?.id !== undefined && data?.id !== null && data?.id !== '') {
+                    tx.isBackedup = true;
+                    tx.id = data.id;
+                }
+            } catch (err) {
+                Alert.alert('Saved Locally', 'Transaction has been saved locally and will be backed up later.');
+            } finally {
+                setLoading(false);
             }
-        );
+        }
+
+        context.addNewTransaction(tx);
         resetState();
     };
 
@@ -204,7 +225,7 @@ function AddTxScreen({ navigation }) {
                     <TextInput style={styles.textInput} onChangeText={setTxTitle} value={txTitle} placeholder="Enter a title" placeholderTextColor={'grey'} />
                     <Text style={styles.inputLabel}>{value2 === 'Expense' ? 'Cost' : 'Amount'}</Text>
                     <TextInput style={styles.textInput} onChangeText={setTxAmount} value={txAmount} keyboardType="numeric" placeholder="Enter the amount" placeholderTextColor={'grey'} />
-                    <TouchableOpacity style={styles.button} onPress={handleSave}><Text style={styles.buttonText}>Confirm</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.button} disabled={loading} onPress={handleSave}><Text style={styles.buttonText}>{!loading ? 'Confirm' : 'Saving...'}</Text></TouchableOpacity>
                 </View>
             </ScrollView>
         </View>
@@ -218,7 +239,7 @@ export function getTimeStamp() {
 }
 
 export function getID() {
-    return getTimeStamp().replace(/[\s' ']/g, '').replace(/[\s':']/g, '');
+    return `tmp_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
 }
 
 const styles = StyleSheet.create({
