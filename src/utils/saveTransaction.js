@@ -86,3 +86,15 @@ export const extractBackendIds = (response) => {
     if (Array.isArray(response?.insertedIds)) return response.insertedIds;
     return [];
 }
+
+export async function fetchTransactions(token) {
+    const res = await fetch(`${SERVER_URL}/transactions`, {
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "oE03kddUPJHtM3jYFO0eo3964XdXXVPR",
+            "Authorization": `Bearer ${token}`
+        },
+    });
+
+    return parseResponse(res);   
+}
