@@ -1,12 +1,10 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+/* eslint-disable react-native/no-inline-styles */
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Foundation from 'react-native-vector-icons/Foundation'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Navbar from '../../components/Navbar'
-import { useContext } from 'react'
-import { TransactionContext } from '../context/TransactionContext'
-import { Clipboard } from 'react-native'
 
 const options = (id, text, icon, size, choice, screenName, navigateTo) => { // pass icon name as well later
   return (
@@ -23,49 +21,16 @@ const options = (id, text, icon, size, choice, screenName, navigateTo) => { // p
 };
 
 const SettingsScreen = ({ navigation }) => {
-  // const [value, setValue] = useState('');
-  
   const optionsList = [
     options(1, 'Edit username', 'user-pen', 20, 3, 'editProfile', navigation.navigate),
     options(2, 'Change Currency', 'dollar', 30, 1, 'changeCurrency', navigation.navigate),
-    options(3, 'Backup Data (Coming Soon)', 'backup', 24, 2, 'backup', navigation.navigate),
+    options(3, 'Backup Data', 'backup', 24, 2, 'backup', navigation.navigate),
     options(4, 'About App', 'information-circle', 24, 4, 'aboutApp', navigation.navigate),
   ];
   
   return (
     <View style={styles.main}>
       <Navbar navigation={navigation} screenTitle={'Settings'} />
-      {/* <TextInput
-        value={value}
-        onChangeText={setValue}
-        placeholder='Paste your data here...'
-        placeholderTextColor={'grey'}
-        style={styles.input}
-      />
-      <TouchableOpacity style={styles.button} disabled={!value} onPress={() => {
-        if(value.trim()) {
-          try {
-            JSON.parse(value);
-          } catch (error) {
-            Alert.alert('Failed', 'Invalid Data, please check and try again.');
-            return;
-          }
-          Alert.alert('Import Data', 'Are you sure you want to import this data? This will overwrite your existing transaction history.', [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'Import',
-              style: 'destructive',
-              onPress: () => importData(value),
-            }
-          ]);
-        }
-        }}>
-        <Text style={styles.buttonText}>Import Data</Text>
-      </TouchableOpacity> */}
-
       <View style={{ marginTop: 30 }}>
         {optionsList}
       </View>
