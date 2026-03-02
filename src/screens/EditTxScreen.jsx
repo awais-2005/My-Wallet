@@ -21,7 +21,7 @@ function EditTxScreen({ navigation, route }) {
     }, [route.params]);
 
     useEffect(() => {
-        setTxTitle(tx.title);
+        setTxTitle(tx.description);
         setTxAmount((tx.amount < 0 ? -tx.amount : tx.amount) + '');
         setValue2(tx.type !== 'Income' ? 'Expense' : 'Income');
         setValue(tx.type === 'Income' ? null : tx.type);
@@ -154,10 +154,10 @@ function EditTxScreen({ navigation, route }) {
         context.updateTransaction(
             {
                 id: tx.id,
-                title: txTitle,
+                description: txTitle,
                 type: value2 === 'Expense' ? value : value2,
                 amount: value2 === 'Expense' ? -Number(txAmount) : Number(txAmount), // make a validator
-                date: tx.date,
+                created_at: tx.created_at,
             },
         );
         resetState();
